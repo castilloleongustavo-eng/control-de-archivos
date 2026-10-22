@@ -1,0 +1,22 @@
+{
+    "pdf_canvas_rendered":  true,
+    "executed_at_utc":  "2026-10-22T06:05:50.8272103Z",
+    "desktop":  "1440x1000",
+    "result":  "passed",
+    "base_url":  "http://127.0.0.1:8088",
+    "browser":  "Chrome local existente",
+    "mobile_horizontal_overflow":  false,
+    "screenshots":  [
+                        "dashboard-desktop.png",
+                        "dashboard-mobile.png",
+                        "delete-dialog.png",
+                        "files-desktop.png",
+                        "login-desktop.png",
+                        "login-mobile.png",
+                        "pdf-preview-desktop.png",
+                        "registro-desktop.png",
+                        "upload-desktop.png",
+                        "upload-mobile.png"
+                    ],
+    "mobile":  "390x844"
+}

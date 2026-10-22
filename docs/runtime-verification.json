@@ -1,0 +1,16 @@
+{
+    "php":  "8.5.12",
+    "sapi":  "apache2handler",
+    "x64":  true,
+    "thread_safe":  true,
+    "extensions":  {
+                       "pdo_mysql":  true,
+                       "fileinfo":  true,
+                       "mbstring":  true,
+                       "openssl":  true,
+                       "zip":  true
+                   },
+    "upload_max_filesize":  "10M",
+    "post_max_size":  "12M",
+    "verified_at_utc":  "2026-10-22T06:05:41.3998411Z"
+}
