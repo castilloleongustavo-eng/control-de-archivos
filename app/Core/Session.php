@@ -7,8 +7,8 @@ final class Session
     {
         ini_set('session.use_strict_mode', '1');
         ini_set('session.use_only_cookies', '1');
-        session_save_path(ROOT . '/storage/sessions');
-        session_name('admosa_session');
+        session_save_path(STORAGE_ROOT . '/sessions');
+        session_name(getenv('APP_PROFILE') === 'test' ? 'admosa_test_session' : 'admosa_session');
         session_set_cookie_params(['lifetime' => 0, 'path' => '/', 'secure' => isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off', 'httponly' => true, 'samesite' => 'Lax']);
         session_start();
         if (isset($_SESSION['last_activity']) && time() - $_SESSION['last_activity'] > (int)(getenv('SESSION_TIMEOUT') ?: 1800)) {
