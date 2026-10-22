@@ -8,7 +8,7 @@ final class UploadValidator
     public const TYPES = ['pdf' => 'application/pdf', 'jpg' => 'image/jpeg', 'jpeg' => 'image/jpeg', 'png' => 'image/png', 'txt' => 'text/plain', 'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'xlsx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'];
     public function inspect(string $path, string $name): array
     {
-        if ($name === '' || mb_strlen($name) > 180 || preg_match('/[\x00-\x1f\x7f<>:"\/\\\\|?*]/u', $name) || str_contains($name, '..') || trim($name, " .") !== $name) throw new HttpException(422, 'El nombre del archivo contiene caracteres no permitidos.');
+        if ($name === '' || !mb_check_encoding($name, 'UTF-8') || mb_strlen($name) > 180 || preg_match('/[\x00-\x1f\x7f<>:"\/\\\\|?*]/u', $name) || str_contains($name, '..') || trim($name, " .") !== $name) throw new HttpException(422, 'El nombre del archivo contiene caracteres no permitidos.');
         $ext = strtolower(pathinfo($name, PATHINFO_EXTENSION));
         if (!isset(self::TYPES[$ext]) || preg_match('/\.(php\d*|phtml|phar|exe|dll|bat|cmd|ps1|js|html?|svg|com|scr)(\.|$)/i', $name)) throw new HttpException(422, 'Formato no permitido. Usa PDF, JPG, PNG, TXT, DOCX o XLSX.');
         $size = filesize($path);

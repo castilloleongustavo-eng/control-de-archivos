@@ -28,6 +28,8 @@ LoadModule mime_module modules/mod_mime.so
 LoadModule dir_module modules/mod_dir.so
 LoadModule rewrite_module modules/mod_rewrite.so
 LoadModule log_config_module modules/mod_log_config.so
+LoadFile "$php/libcrypto-3-x64.dll"
+LoadFile "$php/libssl-3-x64.dll"
 LoadFile "$php/php8ts.dll"
 LoadModule php_module "$php/php8apache2_4.dll"
 PHPIniDir "$php"

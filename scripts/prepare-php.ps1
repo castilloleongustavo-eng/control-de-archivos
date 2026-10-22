@@ -25,7 +25,6 @@ extension=fileinfo
 extension=mbstring
 extension=openssl
 extension=zip
-extension=curl
 file_uploads=On
 upload_max_filesize=10M
 post_max_size=12M

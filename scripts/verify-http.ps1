@@ -16,7 +16,7 @@ echo json_encode(['php'=>PHP_VERSION,'sapi'=>PHP_SAPI,'x64'=>PHP_INT_SIZE===8,'t
 '@
 try {
     [IO.File]::WriteAllText($probe, $source, [Text.UTF8Encoding]::new($false))
-    $result = Invoke-RestMethod -Uri ($BaseUrl.TrimEnd('/') + '/' + $name)
+    $result = Invoke-RestMethod -Uri ($BaseUrl.TrimEnd('/') + '/' + $name) -TimeoutSec 15
     $result | ConvertTo-Json -Depth 4
     if ($result.php -ne '8.5.12' -or $result.sapi -ne 'apache2handler' -or !$result.x64 -or !$result.thread_safe -or @($result.extensions.PSObject.Properties | Where-Object { !$_.Value }).Count -gt 0) { throw 'El runtime HTTP no cumple los requisitos.' }
 } finally {
