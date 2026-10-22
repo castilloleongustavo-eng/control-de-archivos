@@ -1,0 +1,14 @@
+.env
+/storage/private/*
+!/storage/private/.gitkeep
+/storage/logs/*
+!/storage/logs/.gitkeep
+/storage/sessions/*
+!/storage/sessions/.gitkeep
+/storage/runtime/*
+!/storage/runtime/.gitkeep
+/tools/
+/tests/.runtime/
+*.zip
+*.tmp
+*.log
