@@ -1,0 +1,15 @@
+{
+    "php":  "8.5.12",
+    "sapi":  "apache2handler",
+    "x64":  true,
+    "multihilo":  true,
+    "extensiones":  {
+                        "pdo_mysql":  true,
+                        "fileinfo":  true,
+                        "mbstring":  true,
+                        "openssl":  true,
+                        "zip":  true
+                    },
+    "carga_maxima":  "10M",
+    "cuerpo_maximo":  "12M"
+}

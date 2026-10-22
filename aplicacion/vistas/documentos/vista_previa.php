@@ -1,0 +1,13 @@
+<div class="encabezado-pagina"><div><span class="sobretitulo">VISTA PREVIA</span><h1 class="titulo-previa"><?= escapar($documento['nombre_original']) ?></h1><p class="texto-secundario"><?= escapar(strtoupper($documento['extension'])) ?> · <?= escapar(tamanoLegible((int)$documento['tamano_bytes'])) ?> · <?= escapar(date('d/m/Y', strtotime($documento['fecha_carga']))) ?></p></div><div class="acciones-previa"><a href="/documentos" class="btn btn-outline-secondary">Volver</a><a href="/documentos/<?= escapar($documento['id_documento']) ?>/descargar" class="btn btn-primary">↓ Descargar</a></div></div>
+<section class="panel-previa">
+<?php if (in_array($documento['tipo_mime'], ['image/jpeg','image/png'], true)): ?><img class="imagen-previa" src="/documentos/<?= escapar($documento['id_documento']) ?>/ver" alt="Vista previa de <?= escapar($documento['nombre_original']) ?>">
+<?php elseif ($documento['tipo_mime'] === 'application/pdf'): ?>
+<div class="visor-pdf" id="visor-pdf" data-origen="/documentos/<?= escapar($documento['id_documento']) ?>/ver">
+    <div class="barra-pdf"><button class="btn btn-sm btn-outline-secondary" id="pdf-anterior" type="button" disabled>← Anterior</button><span id="contador-paginas" aria-live="polite">Cargando documento…</span><button class="btn btn-sm btn-outline-secondary" id="pdf-siguiente" type="button" disabled>Siguiente →</button></div>
+    <p id="estado-pdf" class="texto-secundario ayuda-previa" role="status">Preparando la vista previa del documento.</p>
+    <div class="contenedor-lienzo-pdf"><canvas id="lienzo-pdf" role="img" aria-label="Página del documento PDF"></canvas></div>
+</div>
+<script type="module" src="/recursos/scripts/vista_pdf.js"></script>
+<p class="texto-secundario ayuda-previa">Para buscar texto o usar un lector de pantalla, descarga el PDF y ábrelo con tu lector habitual.</p>
+<?php else: ?><div class="estado-vacio"><div class="icono-documento" aria-hidden="true"><?= escapar(strtoupper($documento['extension'])) ?></div><h2>Tu documento está listo</h2><p>Descárgalo para abrirlo con la aplicación correspondiente.</p><a href="/documentos/<?= escapar($documento['id_documento']) ?>/descargar" class="btn btn-primary">Descargar documento</a></div><?php endif; ?>
+</section>
