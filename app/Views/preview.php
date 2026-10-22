@@ -1,0 +1,6 @@
+<div class="page-heading"><div><span class="eyebrow">VISTA PREVIA</span><h1 class="preview-title"><?= e($file['original_name']) ?></h1><p class="muted"><?= e(strtoupper($file['extension'])) ?> · <?= e(bytes((int)$file['file_size'])) ?> · <?= e(date('d/m/Y', strtotime($file['created_at']))) ?></p></div><div class="preview-actions"><a href="/files" class="btn btn-outline-secondary">Volver</a><a href="/files/<?= e($file['id']) ?>/download" class="btn btn-primary">↓ Descargar</a></div></div>
+<section class="preview-panel">
+<?php if (in_array($file['mime_type'], ['image/jpeg','image/png'], true)): ?><img class="preview-image" src="/files/<?= e($file['id']) ?>/view" alt="Vista previa de <?= e($file['original_name']) ?>">
+<?php elseif ($file['mime_type'] === 'application/pdf'): ?><iframe class="pdf-preview" src="/files/<?= e($file['id']) ?>/view" title="Vista previa del PDF" sandbox></iframe><p class="muted preview-tip">Si tu navegador no muestra el PDF, usa el botón Descargar.</p>
+<?php else: ?><div class="empty-state"><div class="file-icon" aria-hidden="true"><?= e(strtoupper($file['extension'])) ?></div><h2>Tu documento está listo</h2><p>Descárgalo para abrirlo con la aplicación correspondiente.</p><a href="/files/<?= e($file['id']) ?>/download" class="btn btn-primary">Descargar documento</a></div><?php endif; ?>
+</section>

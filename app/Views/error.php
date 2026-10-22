@@ -1,0 +1,1 @@
+<div class="error-page"><span class="eyebrow">SOLICITUD NO COMPLETADA</span><div class="error-code"><?= e($status) ?></div><h2>No pudimos completar esta acción</h2><p class="muted"><?= e($message) ?></p><a href="<?= isset($_SESSION['user']) ? '/files' : '/login' ?>" class="btn btn-primary">Volver a <?= isset($_SESSION['user']) ? 'mis archivos' : 'iniciar sesión' ?></a></div>
