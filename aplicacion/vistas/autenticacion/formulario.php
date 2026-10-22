@@ -13,7 +13,7 @@
 <?php endif;?>
 <label for="contrasena">Contraseña</label><div class="campo-contrasena"><input class="form-control" id="contrasena" type="password" name="contrasena" required <?= $registro?'minlength="8" maxlength="72"':'' ?> autocomplete="<?= $registro?'new-password':'current-password' ?>" placeholder="<?= $registro?'Al menos 8 caracteres':'Tu contraseña' ?>"><button type="button" class="alternar-contrasena" aria-label="Mostrar contraseña" aria-controls="contrasena">Ver</button></div>
 <?php if($registro):?><label for="confirmacion_contrasena">Confirmar contraseña</label><input class="form-control" id="confirmacion_contrasena" type="password" name="confirmacion_contrasena" required minlength="8" maxlength="72" autocomplete="new-password"><?php endif;?>
-<button type="submit" class="btn btn-primary w-100 enviar-autenticacion"><?= $registro?'Crear cuenta':'Iniciar sesión' ?><span aria-hidden="true">→</span></button>
+<button type="submit" class="btn btn-primary w-100 enviar-autenticacion"><?= $registro?'Crear cuenta':'Iniciar sesión' ?><svg class="icono-interfaz" aria-hidden="true"><use href="/recursos/iconos/interfaz.svg#flecha"></use></svg></button>
 </form>
 <p class="alternativa-autenticacion"><?= $registro?'¿Ya tienes una cuenta?':'¿Aún no tienes una cuenta?' ?><a href="<?= $registro?'/ingresar':'/registrarse' ?>"><?= $registro?'Inicia sesión':'Crea una cuenta' ?></a></p>
 <div class="seguridad-autenticacion"><span class="indicador-seguridad"></span>Tus archivos solo están disponibles para ti.</div>
