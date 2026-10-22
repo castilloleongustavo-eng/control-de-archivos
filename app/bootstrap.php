@@ -15,9 +15,10 @@ if (is_file(ROOT . '/.env')) {
     }
 }
 date_default_timezone_set('America/Guatemala');
+define('STORAGE_ROOT', getenv('APP_PROFILE') === 'test' ? ROOT . '/tests/.runtime/storage' : ROOT . '/storage');
 ini_set('display_errors', '0');
 ini_set('log_errors', '1');
-ini_set('error_log', ROOT . '/storage/logs/php.log');
+ini_set('error_log', STORAGE_ROOT . '/logs/php.log');
 function e(mixed $value): string { return htmlspecialchars((string)$value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); }
 function csrf(): string { return '<input type="hidden" name="_token" value="' . e(\App\Core\Session::token()) . '">'; }
 function redirect(string $path): never { header('Location: ' . $path, true, 303); exit; }

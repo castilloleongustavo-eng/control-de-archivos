@@ -1,4 +1,6 @@
 .env
+.env.*
+!.env.example
 /storage/private/*
 !/storage/private/.gitkeep
 /storage/logs/*
