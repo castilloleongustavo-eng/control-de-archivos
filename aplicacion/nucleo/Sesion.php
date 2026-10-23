@@ -12,6 +12,7 @@ final class Sesion
         session_name(getenv('PERFIL_APLICACION')==='pruebas'?'documentos_pruebas_sesion':'documentos_sesion');
         session_set_cookie_params(['lifetime'=>0,'path'=>'/','secure'=>isset($_SERVER['HTTPS'])&&$_SERVER['HTTPS']!=='off','httponly'=>true,'samesite'=>'Lax']);
         session_start();
+        // La actividad se compara con el límite configurado; al caducar se descarta la identidad anterior.
         if (isset($_SESSION['ultima_actividad']) && time()-$_SESSION['ultima_actividad']>(int)(getenv('SESION_INACTIVIDAD')?:1800)) { $_SESSION=[]; session_regenerate_id(true); self::notificar('Tu sesión expiró por inactividad. Inicia sesión nuevamente.'); }
         $_SESSION['ultima_actividad']=time();
     }

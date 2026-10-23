@@ -8,8 +8,10 @@ final class Vista
     public static function mostrar(string $plantilla, array $datos = []): void
     {
         extract($datos, EXTR_SKIP);
+        // EXTR_SKIP evita reemplazar variables locales. El aviso se consume una sola vez tras una redirección.
         $aviso = $_SESSION['aviso'] ?? null; unset($_SESSION['aviso']);
         ob_start(); require RUTAS['vistas'] . '/' . $plantilla . '.php';
+        // El búfer captura la vista específica y la estructura común incorpora después ese contenido.
         $contenido = ob_get_clean(); require RUTAS['vistas'] . '/componentes/estructura.php';
     }
 }

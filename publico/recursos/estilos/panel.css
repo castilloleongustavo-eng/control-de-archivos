@@ -1,4 +1,4 @@
-/* Navegación inspirada en form: menú oscuro contraíble y barra superior independiente. */
+/* Navegación lateral contraíble y barra superior independiente. */
 .barra-lateral { position: fixed; inset: 0 auto 0 0; z-index: 60; display: flex; flex-direction: column; width: var(--ancho-menu); height: 100dvh; padding: 29px 18px 21px; color: #cbd5e1; background: var(--azul-oscuro); transition: width .2s ease, transform .2s ease; }
 .cabecera-navegacion { display: flex; align-items: center; justify-content: space-between; min-height: 43px; padding-inline: 7px; }
 .cabecera-navegacion .marca { gap: 11px; font-size: 20px; color: white; }

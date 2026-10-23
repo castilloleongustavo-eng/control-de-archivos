@@ -10,10 +10,12 @@ final class Enrutador
     public function despachar(): void
     {
         $ruta=parse_url($_SERVER['REQUEST_URI'],PHP_URL_PATH); $metodo=$_SERVER['REQUEST_METHOD'];
+        // Antes de despachar se limita el cuerpo, se exige sesión en rutas privadas y se valida CSRF para cada POST.
         if ($metodo==='POST' && (int)($_SERVER['CONTENT_LENGTH']??0)>PARAMETROS_SEGURIDAD['limite_cuerpo_bytes']) throw new ExcepcionHttp(413,'La solicitud supera el tamaño permitido. Máximo 10 MB por archivo.');
         if ($ruta==='/' || str_starts_with((string)$ruta,'/documentos') || $ruta==='/salir') Seguridad::usuario();
         if ($metodo==='POST') Seguridad::campoCsrf();
         $autenticacion=new ControladorAutenticacion(); $documentos=new ControladorDocumentos();
+        // GET consulta o presenta formularios; POST realiza operaciones que cambian datos.
         if ($metodo==='GET') {
             switch ($ruta) {
                 case '/ingresar': $autenticacion->formulario('ingresar'); return;
@@ -32,6 +34,7 @@ final class Enrutador
             }
         }
         if (preg_match('#^/documentos/([a-f0-9]{32})/(ver|descargar|vista-previa|eliminar)$#D',(string)$ruta,$coincidencias)) {
+            // La expresión extrae un ID hexadecimal de longitud fija y una operación conocida.
             $operacion=$coincidencias[2]; $identificador=$coincidencias[1];
             if ($operacion==='eliminar' && $metodo==='POST') { $documentos->eliminar($identificador); return; }
             if ($operacion!=='eliminar' && $metodo==='GET') { if ($operacion==='vista-previa') $documentos->vistaPrevia($identificador); else $documentos->transmitir($identificador,$operacion==='descargar'); return; }

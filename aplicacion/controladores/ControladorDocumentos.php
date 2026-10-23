@@ -12,6 +12,7 @@ final class ControladorDocumentos
     public function indice(bool $resumen = false): void
     {
         $usuario = Seguridad::usuario();
+        // Los filtros tienen longitud limitada; la consulta del modelo aplica además la propiedad del documento.
         $busqueda = mb_substr(trim((string)($_GET['busqueda'] ?? '')), 0, 180);
         $tipo = substr((string)($_GET['tipo'] ?? ''), 0, 5);
         $pagina = max(1, (int)($_GET['pagina'] ?? 1));
@@ -41,14 +42,17 @@ final class ControladorDocumentos
         if (!$documento) throw new ExcepcionHttp(404, 'Archivo no disponible.');
         $ruta = (new AlmacenDocumentos())->ruta($documento);
         $recurso = fopen($ruta, 'rb');
+        // No se envían cabeceras del archivo hasta confirmar que se pudo abrir el binario autorizado.
         if ($recurso === false) throw new ExcepcionHttp(404, 'Archivo no disponible.');
         $enLinea = !$descargar && in_array($documento['tipo_mime'], ['application/pdf','image/jpeg','image/png'], true);
+        // PDF e imágenes pueden abrirse directamente. Office y TXT se leen con fetch en el visor de la aplicación.
         header('Content-Type: ' . $documento['tipo_mime']);
         header("Content-Disposition: " . ($enLinea ? 'inline' : 'attachment') . "; filename=\"archivo." . $documento['extension'] . "\"; filename*=UTF-8''" . rawurlencode($documento['nombre_original']));
         header('Content-Length: ' . fstat($recurso)['size']);
         // El PDF puede tener contenido activo: sandbox sin scripts ni navegación.
         header("Content-Security-Policy: sandbox; default-src 'none'; frame-ancestors 'self'");
         header('X-Frame-Options: SAMEORIGIN');
+        // Liberar el bloqueo de sesión permite navegar mientras se termina una descarga larga.
         session_write_close(); fpassthru($recurso); fclose($recurso);
     }
     /** Recibe ID y propietario; aparta el binario, confirma la transacción y restaura el archivo ante fallos. */

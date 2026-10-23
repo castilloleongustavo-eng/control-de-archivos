@@ -1,12 +1,18 @@
-.env
-.env.*
-!.env.example
-/almacenamiento/
+# Credenciales reales: se comparte solamente la plantilla de configuración.
+/configuracion/configuracion.env
+/.env
+/.env.*
+!/.env.example
+
+# Dependencias de ejecución y datos locales; no forman parte del código que se publica.
 /herramientas/ejecucion/
+/almacenamiento/
 /pruebas/.runtime/
-/form/
-/storage/
 /base_datos/respaldos/
-*.tmp
 *.log
+*.cookies
+*.tmp
 *.zip
+*.respaldo-*
+.DS_Store
+Thumbs.db

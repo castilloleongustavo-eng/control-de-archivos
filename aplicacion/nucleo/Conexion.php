@@ -10,6 +10,8 @@ final class Conexion
     public static function obtener(): PDO
     {
         if (self::$conexion === null) {
+            // La contraseña se lee de configuracion/configuracion.env; nunca se incorpora al código del modelo.
+            if (getenv('BD_CONTRASENA') === false) throw new \RuntimeException('Configura la conexión mediante herramientas/configurar.ps1.');
             $servidor = getenv('BD_SERVIDOR') ?: '127.0.0.1';
             $puerto = getenv('BD_PUERTO') ?: '3306';
             $nombre = getenv('BD_NOMBRE') ?: 'documentos';

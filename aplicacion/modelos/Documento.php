@@ -9,6 +9,7 @@ final class Documento
     public static function delPropietario(string $identificador, int $usuario): array|false
     {
         if (!preg_match('/^[a-f0-9]{32}$/D', $identificador)) return false;
+        // Se exige ID y propietario en la misma consulta; conocer una URL no concede acceso al archivo.
         $consulta = Conexion::obtener()->prepare('SELECT * FROM documentos WHERE id_documento=? AND id_usuario=?');
         $consulta->execute([$identificador, $usuario]);
         return $consulta->fetch();
@@ -17,9 +18,11 @@ final class Documento
     public static function listar(int $usuario, string $busqueda = '', string $tipo = '', int $pagina = 1): array
     {
         $sql = 'SELECT * FROM documentos WHERE id_usuario=?'; $parametros = [$usuario];
+        // Los filtros solo se agregan cuando tienen valor. Los comodines del texto se escapan para buscar literalmente.
         if ($busqueda !== '') { $sql .= " AND nombre_original LIKE ? ESCAPE '='"; $parametros[] = '%' . strtr($busqueda, ['=' => '==', '%' => '=%', '_' => '=_']) . '%'; }
         if ($tipo !== '') { $sql .= ' AND extension=?'; $parametros[] = $tipo; }
         $desplazamiento = (max(1, min(100000, $pagina)) - 1) * 25;
+        // OFFSET se calcula con enteros acotados; los datos escritos por el usuario siguen siendo parámetros preparados.
         $consulta = Conexion::obtener()->prepare($sql . ' ORDER BY fecha_carga DESC, id_documento DESC LIMIT 25 OFFSET ' . $desplazamiento);
         $consulta->execute($parametros);
         return $consulta->fetchAll();
@@ -42,7 +45,6 @@ final class Documento
         $consulta->execute([$identificador,$usuario]); return $consulta->fetch();
     }
     /** Elimina la fila bloqueada únicamente si sigue perteneciendo al usuario autenticado. */
-    /** Recibe ID y propietario; aparta el binario, confirma la transacción y restaura el archivo ante fallos. */
     public static function eliminar(string $identificador,int $usuario): void
     {
         Conexion::obtener()->prepare('DELETE FROM documentos WHERE id_documento=? AND id_usuario=?')->execute([$identificador,$usuario]);

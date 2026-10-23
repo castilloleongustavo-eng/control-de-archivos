@@ -9,6 +9,7 @@
   const estructura = document.getElementById('estructura-aplicacion');
   if (!barra || !alternar || !fondo || !estructura) return;
   const consultaMovil = window.matchMedia('(max-width: 960px)');
+  // En escritorio se recuerda la contracción; en móvil se controla por separado si el panel está abierto.
   let contraida = false;
   let abierta = false;
   try { contraida = localStorage.getItem('documentos.menu-contraido') === 'si'; } catch { /* La preferencia visual es opcional. */ }

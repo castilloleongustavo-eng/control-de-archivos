@@ -13,13 +13,16 @@ final class ControladorAutenticacion
     public function registrar(): void
     {
         LimitadorIntentos::registrarIntento('registro');
+        // Los valores POST se convierten a cadenas; usuario y correo se recortan, la contraseña se conserva íntegra.
         $nombre=trim((string)($_POST['nombre_usuario']??'')); $correo=trim((string)($_POST['correo']??'')); $contrasena=(string)($_POST['contrasena']??'');
+        // La cadena if/elseif informa solo el primer problema y evita insertar una cuenta incompleta.
         if (!preg_match('/^[a-zA-Z0-9_]{3,40}$/D',$nombre)) $error='El usuario debe tener entre 3 y 40 letras, números o guiones bajos.';
         elseif (strlen($correo)>254 || !filter_var($correo,FILTER_VALIDATE_EMAIL)) $error='Ingresa un correo electrónico válido.';
         elseif (!mb_check_encoding($contrasena,'UTF-8') || mb_strlen($contrasena)<8 || strlen($contrasena)>72) $error='La contraseña debe tener al menos 8 caracteres y un máximo de 72 bytes.';
         elseif ($contrasena!==($_POST['confirmacion_contrasena']??'')) $error='Las contraseñas no coinciden.';
         else {
             try { Usuario::crear($nombre,$correo,$contrasena); }
+            // El índice UNIQUE decide los duplicados incluso si dos solicitudes llegan al mismo tiempo.
             catch (\PDOException $excepcion) { if ($excepcion->getCode()!=='23000') throw $excepcion; $error='El usuario o correo electrónico ya está registrado.'; }
         }
         if (isset($error)) { http_response_code(422); Vista::mostrar('autenticacion/formulario',['modo'=>'registrarse','titulo'=>'Crear cuenta','error'=>$error]); return; }
@@ -29,12 +32,15 @@ final class ControladorAutenticacion
     public function ingresar(): void
     {
         LimitadorIntentos::registrarIntento('ingreso');
+        // «acceso» admite nombre o correo. Se utiliza un hash de referencia si la cuenta no existe para no omitir la verificación.
         $acceso=substr(trim((string)($_POST['acceso']??'')),0,254); $contrasena=(string)($_POST['contrasena']??'');
         $usuario=Usuario::buscar($acceso);
         $huella=$usuario['hash_contrasena']??'$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2uheWG/igi.';
         if (!password_verify($contrasena,$huella) || !$usuario) { http_response_code(422); Vista::mostrar('autenticacion/formulario',['modo'=>'ingresar','titulo'=>'Iniciar sesión','error'=>'Usuario o contraseña incorrectos.']); return; }
+        // Un acceso correcto permite renovar hashes antiguos sin conocer ni almacenar la contraseña original.
         if (password_needs_rehash($huella,PASSWORD_DEFAULT)) Usuario::actualizarHash((int)$usuario['id_usuario'],$contrasena);
         session_regenerate_id(true);
+        // La sesión conserva únicamente identidad y actividad; la contraseña y su hash no viajan en la cookie.
         $_SESSION=['usuario'=>['id_usuario'=>(int)$usuario['id_usuario'],'nombre_usuario'=>$usuario['nombre_usuario']],'ultima_actividad'=>time()];
         redirigir('/');
     }

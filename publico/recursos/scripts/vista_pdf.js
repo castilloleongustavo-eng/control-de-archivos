@@ -8,6 +8,7 @@ const siguiente = document.getElementById('pdf-siguiente');
 const estado = document.getElementById('estado-pdf');
 const contador = document.getElementById('contador-paginas');
 let documentoPdf;
+// La página actual y la bandera de dibujo evitan ejecutar dos renderizados sobre el mismo canvas.
 let paginaActual = 1;
 let dibujando = false;
 
@@ -19,6 +20,7 @@ async function dibujarPagina(numeroPagina) {
     const pagina = await documentoPdf.getPage(numeroPagina);
     const natural = pagina.getViewport({ scale: 1 });
     const disponible = Math.min(visor.clientWidth - 32, 1100);
+    // Se adapta al ancho del visor sin reservar un lienzo excesivo en documentos con dimensiones inusuales.
     // Las dimensiones del documento no pueden reservar un lienzo mayor de ocho millones de píxeles.
     const escala = Math.min(2, disponible / natural.width, Math.sqrt(8000000 / (natural.width * natural.height)));
     const vista = pagina.getViewport({ scale: escala });

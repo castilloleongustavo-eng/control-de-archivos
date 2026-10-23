@@ -1,8 +1,11 @@
 <?php
 declare(strict_types=1);
-/** Inicializa entorno, autocarga, rutas privadas y utilidades comunes sin emitir HTML. */
+/** Prepara el entorno antes de atender peticiones: configuración, autocarga, rutas y utilidades. */
 define('RAIZ', dirname(__DIR__));
-foreach (is_file(RAIZ . '/.env') ? file(RAIZ . '/.env', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) : [] as $linea) {
+// DOCUMENTOS_ENTORNO permite otra instalación; por defecto se lee el archivo privado de configuracion/.
+define('ARCHIVO_ENTORNO', getenv('DOCUMENTOS_ENTORNO') ?: RAIZ . '/configuracion/configuracion.env');
+// Cada línea aporta una variable; los valores del proceso prevalecen para admitir configuración del servidor.
+foreach (is_file(ARCHIVO_ENTORNO) ? file(ARCHIVO_ENTORNO, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) : [] as $linea) {
     if (str_starts_with(trim($linea), '#') || !str_contains($linea, '=')) continue;
     [$clave, $valor] = explode('=', $linea, 2);
     if (getenv(trim($clave)) === false) putenv(trim($clave) . '=' . trim($valor));
@@ -10,6 +13,7 @@ foreach (is_file(RAIZ . '/.env') ? file(RAIZ . '/.env', FILE_IGNORE_NEW_LINES | 
 spl_autoload_register(function (string $clase): void {
     /** Resuelve únicamente clases propias; el espacio de nombres determina su responsabilidad. */
     if (!str_starts_with($clase, 'Aplicacion\\')) return;
+    // Se retira «Aplicacion\» y se convierte la primera carpeta al nombre físico en minúsculas.
     $partes = explode('\\', substr($clase, 11));
     $partes[0] = strtolower($partes[0]);
     $ruta = RAIZ . '/aplicacion/' . implode('/', $partes) . '.php';
@@ -18,7 +22,8 @@ spl_autoload_register(function (string $clase): void {
 define('RUTAS', require RAIZ . '/configuracion/rutas.php');
 define('PARAMETROS_SEGURIDAD', require RAIZ . '/configuracion/seguridad/parametros.php');
 define('FORMATOS_PERMITIDOS', require RAIZ . '/configuracion/almacenamiento/formatos.php');
-foreach (['sesiones', 'registros', 'temporal'] as $directorio) {
+foreach (['documentos', 'sesiones', 'registros', 'temporal'] as $directorio) {
+    // Solo estas carpetas de datos se crean al ejecutar; todas quedan fuera del proyecto.
     if (!is_dir(RUTAS[$directorio]) && !mkdir(RUTAS[$directorio], 0700, true)) throw new RuntimeException('No se pudo preparar el almacenamiento interno.');
 }
 date_default_timezone_set('America/Guatemala');

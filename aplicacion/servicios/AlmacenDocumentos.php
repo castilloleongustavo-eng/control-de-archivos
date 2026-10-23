@@ -11,6 +11,7 @@ final class AlmacenDocumentos
     public function ruta(array $documento): string
     {
         $esperado = $documento['id_usuario'] . '/' . $documento['nombre_almacenado'];
+        // La ruta se reconstruye desde datos validados; no se acepta una ruta arbitraria enviada por el navegador.
         if (!preg_match('/^[a-f0-9]{64}$/D', $documento['nombre_almacenado']) || $documento['ruta_relativa'] !== $esperado) throw new ExcepcionHttp(404, 'Archivo no disponible.');
         $base = realpath(RUTAS['documentos']);
         $ruta = realpath($base . '/' . $esperado);
@@ -24,10 +25,11 @@ final class AlmacenDocumentos
         if (in_array($carga['error'], [UPLOAD_ERR_INI_SIZE, UPLOAD_ERR_FORM_SIZE], true)) throw new ExcepcionHttp(413, 'El archivo supera el máximo de 10 MB.');
         if ($carga['error'] !== UPLOAD_ERR_OK || !is_uploaded_file($carga['tmp_name'])) throw new ExcepcionHttp(422, 'No se pudo recibir el archivo. Intenta nuevamente.');
         $datos = (new ValidadorDocumento())->inspeccionar($carga['tmp_name'], $carga['name']);
+        // El ID identifica el registro; el nombre físico independiente evita exponer nombres originales en disco.
         $identificador = bin2hex(random_bytes(16)); $nombreAlmacenado = bin2hex(random_bytes(32));
         $directorio = RUTAS['documentos'] . '/' . $usuario;
         if (!is_dir($directorio) && !mkdir($directorio, 0700, true)) throw new \RuntimeException('No se pudo crear el directorio privado');
-        // realpath sobre el directorio impide que una unión o enlace salga de storage/private.
+        // realpath sobre el directorio impide que una unión o enlace salga del directorio privado configurado.
         $raiz = str_replace('\\', '/', realpath(RUTAS['documentos'])) . '/';
         if (!str_starts_with(str_replace('\\', '/', realpath($directorio)) . '/', $raiz)) throw new \RuntimeException('Directorio privado fuera de la ubicación permitida');
         $destino = $directorio . '/' . $nombreAlmacenado;
@@ -35,6 +37,7 @@ final class AlmacenDocumentos
         try {
             Documento::crear([$identificador,$usuario,$datos['nombre_original'],$nombreAlmacenado,$datos['tipo_mime'],$datos['extension'],$datos['tamano_bytes'], $usuario . '/' . $nombreAlmacenado]);
         } catch (\Throwable $excepcion) {
+            // Si falla MySQL después de mover el archivo, se compensa la operación retirando esa carga.
             if (!unlink($destino)) error_log('Carga huérfana: ' . $nombreAlmacenado);
             throw $excepcion;
         }
@@ -43,6 +46,7 @@ final class AlmacenDocumentos
     public function eliminar(string $identificador, int $usuario): void
     {
         $conexion = Conexion::obtener(); $conexion->beginTransaction();
+        // «apartado» permite recuperar el binario si la transacción SQL no llega a confirmarse.
         $ruta = null; $apartado = null;
         try {
             $documento = Documento::bloquearPropietario($identificador,$usuario);

@@ -1,4 +1,5 @@
-<div class="encabezado-pagina"><div><span class="sobretitulo">VISTA PREVIA</span><h1 class="titulo-previa"><?= escapar($documento['nombre_original']) ?></h1><p class="texto-secundario"><?= escapar(strtoupper($documento['extension'])) ?> · <?= escapar(tamanoLegible((int)$documento['tamano_bytes'])) ?> · <?= escapar(date('d/m/Y', strtotime($documento['fecha_carga']))) ?></p></div><div class="acciones-previa"><a href="/documentos" class="btn btn-outline-secondary">Volver</a><a href="/documentos/<?= escapar($documento['id_documento']) ?>/descargar" class="btn btn-primary"><svg class="icono-interfaz" aria-hidden="true"><use href="/recursos/iconos/interfaz.svg#descargar"></use></svg> Descargar</a></div></div>
+<?php /** El tipo MIME selecciona el lector. Todas las URLs del contenido pasan por rutas que verifican sesión y propietario. */ ?>
+<div class="encabezado-pagina"><div><h1 class="titulo-previa"><?= escapar($documento['nombre_original']) ?></h1><p class="texto-secundario"><?= escapar(strtoupper($documento['extension'])) ?> · <?= escapar(tamanoLegible((int)$documento['tamano_bytes'])) ?> · <?= escapar(date('d/m/Y', strtotime($documento['fecha_carga']))) ?></p></div><div class="acciones-previa"><a href="/documentos" class="btn btn-outline-secondary">Volver</a><a href="/documentos/<?= escapar($documento['id_documento']) ?>/descargar" class="btn btn-primary"><svg class="icono-interfaz" aria-hidden="true"><use href="/recursos/iconos/interfaz.svg#descargar"></use></svg> Descargar</a></div></div>
 <section class="panel-previa">
 <?php if (in_array($documento['tipo_mime'], ['image/jpeg','image/png'], true)): ?><img class="imagen-previa" src="/documentos/<?= escapar($documento['id_documento']) ?>/ver" alt="Vista previa de <?= escapar($documento['nombre_original']) ?>">
 <?php elseif ($documento['tipo_mime'] === 'application/pdf'): ?>
@@ -8,6 +9,13 @@
     <div class="contenedor-lienzo-pdf"><canvas id="lienzo-pdf" role="img" aria-label="Página del documento PDF"></canvas></div>
 </div>
 <script type="module" src="/recursos/scripts/vista_pdf.js"></script>
-<p class="texto-secundario ayuda-previa">Para buscar texto o usar un lector de pantalla, descarga el PDF y ábrelo con tu lector habitual.</p>
-<?php else: ?><div class="estado-vacio"><div class="icono-documento" aria-hidden="true"><?= escapar(strtoupper($documento['extension'])) ?></div><h2>Tu documento está listo</h2><p>Descárgalo para abrirlo con la aplicación correspondiente.</p><a href="/documentos/<?= escapar($documento['id_documento']) ?>/descargar" class="btn btn-primary">Descargar documento</a></div><?php endif; ?>
+
+<?php else: ?>
+<div id="visor-documento" data-origen="/documentos/<?= escapar($documento['id_documento']) ?>/ver" data-formato="<?= escapar($documento['extension']) ?>" aria-busy="true">
+    <p id="estado-documento" class="texto-secundario" role="status">Cargando documento…</p>
+    <div id="controles-documento" class="controles-documento" hidden></div>
+    <div id="contenido-documento" class="contenido-documento"></div>
+</div>
+<script type="module" src="/recursos/scripts/vista_documento.js"></script>
+<?php endif; ?>
 </section>
