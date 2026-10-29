@@ -1,4 +1,10 @@
 <?php
+/**
+ * Archivo: aplicacion/controladores/ControladorAutenticacion.php
+ * Propósito: Atiende el registro, inicio y cierre de sesión.
+ * Funcionamiento: Recibe formularios, valida campos, consulta Usuario y el limitador de intentos, y responde con vistas o redirecciones.
+ */
+
 declare(strict_types=1);
 namespace Aplicacion\Controladores;
 use Aplicacion\Nucleo\{Sesion, Vista};
@@ -12,6 +18,7 @@ final class ControladorAutenticacion
     /** Valida usuario, correo y contraseña, y crea una cuenta con hash y restricciones únicas. */
     public function registrar(): void
     {
+        // Registra el intento antes de validar para limitar también los formularios incorrectos.
         LimitadorIntentos::registrarIntento('registro');
         // Los valores POST se convierten a cadenas; usuario y correo se recortan, la contraseña se conserva íntegra.
         $nombre=trim((string)($_POST['nombre_usuario']??'')); $correo=trim((string)($_POST['correo']??'')); $contrasena=(string)($_POST['contrasena']??'');
@@ -25,12 +32,14 @@ final class ControladorAutenticacion
             // El índice UNIQUE decide los duplicados incluso si dos solicitudes llegan al mismo tiempo.
             catch (\PDOException $excepcion) { if ($excepcion->getCode()!=='23000') throw $excepcion; $error='El usuario o correo electrónico ya está registrado.'; }
         }
+        // Si hay un error devuelve el formulario con HTTP 422; si todo salió bien avisa y redirige al ingreso.
         if (isset($error)) { http_response_code(422); Vista::mostrar('autenticacion/formulario',['modo'=>'registrarse','titulo'=>'Crear cuenta','error'=>$error]); return; }
         Sesion::notificar('Cuenta creada. Ya puedes iniciar sesión.','success'); redirigir('/ingresar');
     }
     /** Comprueba el hash, regenera la sesión y guarda únicamente identidad y actividad. */
     public function ingresar(): void
     {
+        // Controla la frecuencia de ingreso antes de buscar la cuenta y verificar la contraseña.
         LimitadorIntentos::registrarIntento('ingreso');
         // «acceso» admite nombre o correo. Se utiliza un hash de referencia si la cuenta no existe para no omitir la verificación.
         $acceso=substr(trim((string)($_POST['acceso']??'')),0,254); $contrasena=(string)($_POST['contrasena']??'');
@@ -39,6 +48,7 @@ final class ControladorAutenticacion
         if (!password_verify($contrasena,$huella) || !$usuario) { http_response_code(422); Vista::mostrar('autenticacion/formulario',['modo'=>'ingresar','titulo'=>'Iniciar sesión','error'=>'Usuario o contraseña incorrectos.']); return; }
         // Un acceso correcto permite renovar hashes antiguos sin conocer ni almacenar la contraseña original.
         if (password_needs_rehash($huella,PASSWORD_DEFAULT)) Usuario::actualizarHash((int)$usuario['id_usuario'],$contrasena);
+        // Cambia el identificador y reemplaza los datos de sesión para establecer la identidad autenticada.
         session_regenerate_id(true);
         // La sesión conserva únicamente identidad y actividad; la contraseña y su hash no viajan en la cookie.
         $_SESSION=['usuario'=>['id_usuario'=>(int)$usuario['id_usuario'],'nombre_usuario'=>$usuario['nombre_usuario']],'ultima_actividad'=>time()];

@@ -1,4 +1,10 @@
 <?php
+/**
+ * Archivo: aplicacion/nucleo/Sesion.php
+ * Propósito: Administra la sesión y los avisos temporales del usuario.
+ * Funcionamiento: Configura cookies y almacenamiento, controla la inactividad, genera tokens CSRF y permite cerrar la sesión.
+ */
+
 declare(strict_types=1);
 namespace Aplicacion\Nucleo;
 /** Gestiona sesiones privadas con protección contra fijación y caducidad por inactividad. */
@@ -7,9 +13,11 @@ final class Sesion
     /** Inicia la sesión HTTP usando rutas centralizadas y cookies HttpOnly/SameSite. */
     public static function iniciar(): void
     {
+        // Acepta identificadores de sesión válidos y utiliza cookies para transportarlos.
         ini_set('session.use_strict_mode','1'); ini_set('session.use_only_cookies','1');
         session_save_path(RUTAS['sesiones']);
         session_name(getenv('PERFIL_APLICACION')==='pruebas'?'documentos_pruebas_sesion':'documentos_sesion');
+        // Configura HTTPS cuando está disponible, bloquea el acceso desde JavaScript y utiliza SameSite Lax.
         session_set_cookie_params(['lifetime'=>0,'path'=>'/','secure'=>isset($_SERVER['HTTPS'])&&$_SERVER['HTTPS']!=='off','httponly'=>true,'samesite'=>'Lax']);
         session_start();
         // La actividad se compara con el límite configurado; al caducar se descarta la identidad anterior.
@@ -23,6 +31,7 @@ final class Sesion
     /** Destruye datos y cookie; conserva los atributos de seguridad al expirar la cookie. */
     public static function destruir(): void
     {
+        // Borra la identidad del servidor y prepara la expiración de la cookie con sus atributos originales.
         $_SESSION=[]; $parametros=session_get_cookie_params();
         setcookie(session_name(),'',['expires'=>time()-3600,'path'=>$parametros['path'],'secure'=>$parametros['secure'],'httponly'=>true,'samesite'=>'Lax']); session_destroy();
     }

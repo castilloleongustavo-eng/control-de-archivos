@@ -1,4 +1,10 @@
+/**
+ * Archivo: publico/recursos/estilos/interfaz-nocturna.css
+ * Propósito: Aplica el tema oscuro sobre los estilos base.
+ * Funcionamiento: Sobrescribe variables y componentes con superficies oscuras, fondo de estrellas y botones rojos según el orden de importación.
+ */
 /* Paleta compartida con el acceso: estrellas locales, texto blanco y acciones rojas. */
+/* Variables que reemplazan la paleta base para activar el esquema oscuro. */
 :root {
   color-scheme: dark;
   --azul-oscuro: #0b1018;
@@ -13,10 +19,12 @@
   --sombra: none;
 }
 body { background: #080c13; }
+/* Capa fija de estrellas con degradado que no intercepta clics. */
 body::before { content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none; background: linear-gradient(rgb(0 0 0 / 57%), rgb(0 0 0 / 65%)), url("../imagenes/fondo-acceso.jpg") center / cover no-repeat; }
 a, a:hover { color: #fff; }
 a:hover { text-underline-offset: 4px; }
 .icono-interfaz { stroke-width: 1.5; }
+/* Sobrescribe botones y campos para unificar su apariencia con el acceso. */
 .btn { border-radius: 24px; font-weight: 500; }
 .btn-primary, .btn-danger { background: #d32f2f; border-color: #d32f2f; box-shadow: none; }
 .btn-primary:hover, .btn-primary:active, .btn-danger:hover { background: #b92525; border-color: #b92525; }
@@ -59,6 +67,7 @@ a:hover { text-underline-offset: 4px; }
 .panel-documentos, .panel-carga, .panel-previa { background: var(--superficie); box-shadow: none; }
 .encabezado-panel h2 { font-size: 16px; font-weight: 400; margin-bottom: 0; }
 .contador-documentos, .etiqueta-tipo { color: #ddd; background: rgb(255 255 255 / 6%); }
+/* Variables Bootstrap y reglas propias para leer la tabla sobre el fondo oscuro. */
 .tabla-documentos { --bs-table-bg: transparent; --bs-table-color: #eee; --bs-table-border-color: var(--borde); }
 .tabla-documentos thead th { background: rgb(255 255 255 / 4%); color: #ddd; text-transform: none; font-size: 12px; font-weight: 400; letter-spacing: 0; }
 .tabla-documentos td { color: #ddd; border-color: var(--borde); }
@@ -83,9 +92,11 @@ dialog { color: #fff; background: #10151e; }
 dialog::backdrop { background: rgb(0 0 0 / 70%); }
 dialog h2 { font-size: 20px; font-weight: 400; }
 .alert { color-scheme: light; }
+/* En móvil el fondo del menú evita que su contenido se mezcle con la pantalla de detrás. */
 @media (max-width: 960px) {
   .barra-lateral { background: #0b1018 url("../imagenes/fondo-acceso.jpg") center / cover; box-shadow: inset 0 0 0 100vmax rgb(0 0 0 / 70%); }
 }
+/* Ajustes compactos del tema para teléfonos. */
 @media (max-width: 620px) {
   .barra-superior { height: 68px; }
   .espacio { min-height: calc(100dvh - 68px); }

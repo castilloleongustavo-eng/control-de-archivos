@@ -1,3 +1,8 @@
+/**
+ * Archivo: publico/recursos/estilos/acceso.css
+ * Propósito: Define la presentación de ingreso y registro.
+ * Funcionamiento: Centra el formulario sobre el fondo, ajusta campos y contraseña y adapta el espacio en pantallas pequeñas.
+ */
 /* Fondo local y formulario mínimo, compartido por ingreso y registro. */
 .pantalla-autenticacion {
   display: grid;
@@ -9,10 +14,12 @@
   background: linear-gradient(rgb(0 0 0 / 57%), rgb(0 0 0 / 65%)), url("../imagenes/fondo-acceso.jpg") center / cover no-repeat;
   background-color: #080c13;
 }
+/* Contenedor: limita el ancho y presenta el emblema encima de los campos. */
 .panel-autenticacion { width: 100%; max-width: 320px; }
 .emblema-acceso { display: grid; place-items: center; width: 90px; height: 90px; margin: 0 auto 58px; border-radius: 50%; background: rgb(255 255 255 / 10%); }
 .emblema-acceso .icono-interfaz { width: 34px; height: 34px; }
 .contenedor-autenticacion { width: 100%; }
+/* Distribuye campos y define sus estados de foco y autocompletado. */
 .formulario-autenticacion { display: grid; gap: 22px; }
 .formulario-autenticacion .form-control {
   min-height: 44px;
@@ -28,10 +35,12 @@
 .formulario-autenticacion .form-control::placeholder { color: #eee; opacity: 1; }
 .formulario-autenticacion .form-control:focus { border-color: #fff; box-shadow: 0 1px 0 #fff; outline: 2px solid transparent; }
 .formulario-autenticacion .form-control:-webkit-autofill { -webkit-text-fill-color: #fff; caret-color: #fff; transition: background-color 99999s; }
+/* Reserva espacio para Ver sin superponer el botón al texto de la contraseña. */
 .campo-contrasena { position: relative; }
 .campo-contrasena input { padding-right: 62px !important; }
 .alternar-contrasena { position: absolute; top: 0; right: 0; min-height: 44px; min-width: 44px; padding: 0 5px; border: 0; background: transparent; color: #eee; font-size: 12px; cursor: pointer; }
 .alternar-contrasena:hover { color: #fff; text-decoration: underline; }
+/* Botón principal y enlace para cambiar entre ingreso y registro. */
 .pantalla-autenticacion .enviar-autenticacion { min-height: 44px; margin-top: 10px; border: 1px solid #d32f2f; border-radius: 30px; background: #d32f2f; color: #fff; box-shadow: none; font-size: 13px; }
 .pantalla-autenticacion .enviar-autenticacion:hover, .pantalla-autenticacion .enviar-autenticacion:active { border-color: #b92525; background: #b92525; }
 .alternativa-autenticacion { margin: 22px 0 0; text-align: center; font-size: 13px; }
@@ -40,6 +49,7 @@
 .pantalla-autenticacion :focus-visible { outline: 2px solid #fff; outline-offset: 4px; }
 .pantalla-autenticacion .alert { margin-bottom: 24px; }
 .pantalla-autenticacion .pagina-error .texto-secundario { color: #ddd; }
+/* Reduce margen y emblema cuando la pantalla es estrecha o tiene poca altura. */
 @media (max-width: 480px), (max-height: 650px) {
   .pantalla-autenticacion { padding: 32px 24px; }
   .emblema-acceso { width: 76px; height: 76px; margin-bottom: 36px; }

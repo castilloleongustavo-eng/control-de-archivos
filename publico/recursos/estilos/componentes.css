@@ -1,9 +1,15 @@
+/**
+ * Archivo: publico/recursos/estilos/componentes.css
+ * Propósito: Define componentes de documentos, cargas y errores.
+ * Funcionamiento: Agrupa filtros, tabla, acciones, formulario de carga, lectores y diálogo de eliminación con sus ajustes móviles.
+ */
 /* Listados y filtros: mismos datos y acciones en un contenedor con desplazamiento propio. */
 .panel-documentos { min-width: 0; overflow: hidden; border: 1px solid var(--borde); border-radius: var(--radio); background: var(--superficie); box-shadow: var(--sombra); }
 .encabezado-panel { display: flex; align-items: center; justify-content: space-between; gap: 15px; padding: 24px 25px 0; }
 .encabezado-panel h2 { margin: 0 0 5px; font-size: 17px; font-weight: 600; letter-spacing: -.3px; }
 .encabezado-panel p { margin: 0; font-size: 11px; }
 .contador-documentos { padding: 4px 9px; border: 1px solid var(--borde); border-radius: 6px; color: var(--texto-secundario); background: var(--fondo); font-size: 10px; white-space: nowrap; }
+/* Organiza la búsqueda y el selector de extensión del formulario GET. */
 .barra-filtros { display: flex; align-items: center; gap: 10px; padding: 23px 25px; }
 .entrada-busqueda { position: relative; flex: 1; max-width: 410px; }
 .entrada-busqueda > .icono-interfaz { position: absolute; top: 13px; left: 13px; width: 19px; height: 19px; color: #94a3b8; pointer-events: none; }
@@ -12,6 +18,7 @@
 .barra-filtros .form-select { width: 155px; }
 .barra-filtros .btn { font-size: 12px; }
 .limpiar-filtro { padding: 8px; font-size: 11px; }
+/* Tabla con desplazamiento horizontal y encabezados de metadatos. */
 .table-responsive { scrollbar-width: thin; scrollbar-color: #cbd5e1 transparent; }
 .tabla-documentos { min-width: 790px; margin-bottom: 0; vertical-align: middle; font-size: 12px; }
 .tabla-documentos thead th { padding: 13px 20px; background: var(--fondo); color: var(--texto-secundario); border-top: 1px solid var(--borde); border-bottom: 1px solid var(--borde); font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; white-space: nowrap; }
@@ -28,15 +35,18 @@
 .ext-jpg, .ext-jpeg, .ext-png { background: #f5f3ff; border-color: #ede9fe; color: #7c3aed; }
 .ext-xlsx { background: #ecfdf5; border-color: #d1fae5; color: #059669; }
 .etiqueta-tipo { padding: 4px 7px; border-radius: 4px; background: #f1f5f9; color: var(--texto-secundario); font-size: 9px; font-weight: 600; }
+/* Botones de ver, descargar y solicitar la eliminación de cada documento. */
 .acciones-documento { display: flex; justify-content: flex-end; gap: 6px; }
 .boton-accion { display: inline-flex; justify-content: center; align-items: center; width: 36px; height: 36px; padding: 0; border: 1px solid var(--borde); border-radius: 7px; background: white; color: #64748b; cursor: pointer; transition: background-color .16s, border-color .16s; }
 .boton-accion .icono-interfaz { width: 17px; height: 17px; }
 .boton-accion:hover { color: var(--azul); background: var(--azul-suave); border-color: #bfdbfe; }
 .boton-accion.peligro:hover { color: #dc2626; background: #fef2f2; border-color: #fecaca; }
+/* Indicador de página y enlaces para recorrer los resultados. */
 .barra-paginacion { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 15px 25px; border-top: 1px solid var(--borde); font-size: 11px; color: var(--texto-secundario); }
 .barra-paginacion > div { display: flex; gap: 8px; }
 .nota-formatos { display: flex; align-items: center; justify-content: center; gap: 9px; flex-wrap: wrap; margin: 18px 0 29px; color: #94a3b8; font-size: 10px; }
 .nota-formatos .icono-interfaz { width: 14px; height: 14px; }
+/* Presentación sin archivos o sin resultados de búsqueda. */
 .estado-vacio { padding: 49px 20px 53px; text-align: center; }
 .icono-vacio { display: grid; width: 62px; height: 62px; place-items: center; margin: 0 auto 21px; border: 1px solid #e2e8f0; border-radius: 16px; background: var(--fondo); color: #94a3b8; }
 .icono-vacio .icono-interfaz { width: 29px; height: 29px; }
@@ -47,6 +57,7 @@
 /* Carga: no cambia los campos nativos ni el envío del formulario. */
 .estructura-carga { display: grid; grid-template-columns: minmax(0, 1fr) 260px; gap: 30px; margin-bottom: 35px; }
 .panel-carga { min-width: 0; padding: 27px; border: 1px solid var(--borde); border-radius: var(--radio); background: white; box-shadow: var(--sombra); }
+/* Área de selección y arrastre con control nativo para elegir el archivo. */
 .zona-carga { padding: 35px 24px 25px; border: 1.5px dashed #cbd5e1; border-radius: 12px; background: var(--fondo); text-align: center; transition: background-color .16s, border-color .16s; }
 .zona-carga.arrastrando { background: var(--azul-suave); border-color: var(--azul); }
 .icono-carga { display: grid; width: 62px; height: 62px; place-items: center; margin: 0 auto 22px; border: 1px solid #dbeafe; border-radius: 17px; background: white; color: var(--azul); }
@@ -57,6 +68,7 @@
 .zona-carga input::file-selector-button { padding: 9px 14px; margin: -8px 14px -8px -8px; background: var(--azul); color: white; border: 0; font-weight: 500; font-size: 11px; }
 .zona-carga input:hover::file-selector-button { background: #1d4ed8; color: white; }
 .zona-carga small { display: block; margin-top: 17px; color: #94a3b8; font-size: 10px; }
+/* Resumen del archivo elegido y botones de cancelar o guardar. */
 .archivo-seleccionado { padding: 17px 0; border-bottom: 1px solid var(--borde); color: var(--texto-secundario); font-size: 12px; overflow-wrap: anywhere; }
 .acciones-carga { display: flex; justify-content: flex-end; gap: 10px; padding-top: 23px; }
 .ayuda-carga { padding: 24px 0; }
@@ -73,6 +85,7 @@
 .acciones-previa { display: flex; gap: 10px; }
 .panel-previa { margin-bottom: 30px; padding: 22px; border: 1px solid var(--borde); border-radius: var(--radio); background: white; }
 .imagen-previa { display: block; max-width: 100%; max-height: 70vh; object-fit: contain; margin: auto; }
+/* Navegación de páginas PDF y contenedor desplazable del canvas. */
 .barra-pdf { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding-bottom: 18px; font-size: 12px; color: var(--texto-secundario); }
 .contenedor-lienzo-pdf { max-height: 70vh; overflow: auto; padding: 16px; border-radius: 9px; background: #f1f5f9; text-align: center; }
 #lienzo-pdf { display: block; max-width: 100%; height: auto; margin: auto; background: white; box-shadow: var(--sombra); }
@@ -82,6 +95,7 @@
 .codigo-error { font-size: 80px; font-weight: 700; color: #cbd5e1; letter-spacing: -4px; }
 .pagina-error h2 { font-size: 23px; }
 .pagina-error p { margin: 18px 0 25px; }
+/* Confirmación de eliminación: diálogo modal, fondo oscurecido y botones de respuesta. */
 dialog { max-width: 440px; width: calc(100% - 32px); max-height: calc(100dvh - 40px); overflow-y: auto; padding: 30px; border: 1px solid var(--borde); border-radius: 16px; color: var(--texto); background: white; box-shadow: 0 24px 70px rgb(15 23 42 / 18%); }
 dialog::backdrop { background: rgb(15 23 42 / 47%); }
 .icono-eliminar { display: grid; width: 46px; height: 46px; place-items: center; margin-bottom: 20px; border-radius: 12px; color: #dc2626; background: #fef2f2; }
@@ -89,7 +103,9 @@ dialog::backdrop { background: rgb(15 23 42 / 47%); }
 dialog h2 { margin-bottom: 12px; font-size: 22px; font-weight: 600; letter-spacing: -.5px; }
 dialog p { color: var(--texto-secundario); font-size: 13px; overflow-wrap: anywhere; }
 .acciones-dialogo { display: flex; justify-content: flex-end; gap: 10px; margin-top: 26px; }
+/* Reduce columnas del formulario de carga cuando disminuye el ancho disponible. */
 @media (max-width: 1150px) { .estructura-carga { grid-template-columns: minmax(0, 1fr); gap: 10px; } .ayuda-carga { max-width: 600px; padding-top: 10px; } }
+/* Adapta filtros, márgenes y acciones al ancho de los teléfonos. */
 @media (max-width: 620px) {
   .encabezado-panel { align-items: flex-start; padding: 22px 18px 0; }
   .encabezado-panel h2 { font-size: 17px; }

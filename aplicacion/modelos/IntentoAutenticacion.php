@@ -1,4 +1,10 @@
 <?php
+/**
+ * Archivo: aplicacion/modelos/IntentoAutenticacion.php
+ * Propósito: Guarda el contador de intentos de autenticación.
+ * Funcionamiento: Limpia ventanas vencidas, incrementa una clave y devuelve el contador utilizado por LimitadorIntentos.
+ */
+
 declare(strict_types=1);
 namespace Aplicacion\Modelos;
 use Aplicacion\Nucleo\Conexion;
@@ -12,6 +18,7 @@ final class IntentoAutenticacion
         // Se retiran ventanas vencidas; el incremento atómico evita perder intentos concurrentes.
         $conexion->prepare('DELETE FROM intentos_autenticacion WHERE inicio_ventana < ?')->execute([time() - 900]);
         $conexion->prepare('INSERT INTO intentos_autenticacion (clave,contador,inicio_ventana) VALUES (?,1,?) ON DUPLICATE KEY UPDATE contador=contador+1')->execute([$clave, time()]);
+        // Lee el contador persistido para que el servicio decida si permite continuar.
         $consulta = $conexion->prepare('SELECT contador FROM intentos_autenticacion WHERE clave=?');
         $consulta->execute([$clave]); return (int)$consulta->fetchColumn();
     }

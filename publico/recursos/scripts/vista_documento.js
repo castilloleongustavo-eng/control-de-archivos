@@ -1,5 +1,12 @@
+/**
+ * Archivo: publico/recursos/scripts/vista_documento.js
+ * Propósito: Implementa la lectura local de TXT, DOCX y XLSX.
+ * Funcionamiento: Descarga el documento autorizado, inspecciona XML cuando corresponde y crea elementos de lectura sin ejecutar fórmulas ni macros.
+ */
+// Dependencia local para leer el contenedor ZIP usado por los documentos Office.
 import { unzipSync } from '/recursos/externos/fflate/fflate.js';
 
+// Obtiene elementos de la vista PHP para mostrar estados, controles y contenido.
 const visor = document.getElementById('visor-documento');
 const estado = document.getElementById('estado-documento');
 const contenido = document.getElementById('contenido-documento');
@@ -77,6 +84,7 @@ function mostrarWord(archivos) {
     if (profundidad > 40) throw new Error('El documento es demasiado complejo.');
     for (const hijo of origen.children) {
       let receptor = destino;
+      // Word: transforma párrafos y estilos de título en etiquetas de lectura con alineación conocida.
       if (hijo.localName === 'p') {
         const estilo = atributoWord(descendientes(hijo, 'pStyle')[0], 'val');
         const nivel = /^(?:Heading|Titulo|Título)([1-6])$/i.exec(estilo);
@@ -85,9 +93,11 @@ function mostrarWord(archivos) {
         if (['center', 'right', 'both'].includes(alineacion)) receptor.classList.add('alineacion-' + alineacion);
         if (descendientes(hijo, 'numPr').length) receptor.classList.add('parrafo-lista');
         destino.append(receptor);
+      // Word: conserva la jerarquía de tabla, fila y celda mediante elementos HTML locales.
       } else if (['tbl', 'tr', 'tc'].includes(hijo.localName)) {
         receptor = elemento({ tbl: 'table', tr: 'tr', tc: 'td' }[hijo.localName]);
         destino.append(receptor);
+      // Word: aplica negrita, cursiva y subrayado a los fragmentos de texto.
       } else if (hijo.localName === 'r') {
         receptor = elemento('span');
         const propiedades = hijos(hijo, 'rPr')[0];
@@ -99,6 +109,7 @@ function mostrarWord(archivos) {
       } else if (hijo.localName === 't') { destino.append(document.createTextNode(hijo.textContent)); continue; }
       else if (hijo.localName === 'tab') { destino.append(document.createTextNode('\t')); continue; }
       else if (hijo.localName === 'br' || hijo.localName === 'cr') { destino.append(elemento('br')); continue; }
+      // Word: resuelve imágenes internas y crea una URL de datos para PNG o JPEG.
       else if (hijo.localName === 'blip') {
         const ruta = rutaRelacion('word/document.xml', medios.get(hijo.getAttributeNS(espacioRelaciones, 'embed')));
         if (ruta && archivos[ruta] && /\.(png|jpe?g)$/i.test(ruta)) {
@@ -138,6 +149,7 @@ function formatoNumerico(archivos, libro) {
   const formatos = new Map(estilos ? descendientes(estilos, 'numFmt').map(formato => [Number(formato.getAttribute('numFmtId')), formato.getAttribute('formatCode')]) : []);
   const celdas = estilos && descendientes(estilos, 'cellXfs')[0];
   const indices = celdas ? hijos(celdas, 'xf').map(estilo => Number(estilo.getAttribute('numFmtId'))) : [];
+  // Excel admite dos orígenes de fecha; se usa el del libro al convertir números seriales.
   const origen1904 = ['1', 'true'].includes(descendientes(libro, 'workbookPr')[0]?.getAttribute('date1904'));
   return (valor, estilo) => {
     if (valor === undefined || valor === '' || !Number.isFinite(Number(valor))) return valor;
@@ -163,6 +175,7 @@ function mostrarExcel(archivos) {
   const formatear = formatoNumerico(archivos, libro);
   const hojas = descendientes(libro, 'sheet');
   if (!hojas.length) throw new Error('El libro no contiene hojas.');
+  // Excel: selector de hoja y botones para recorrer bloques de filas y columnas.
   const selector = elemento('select', undefined, 'form-select selector-hoja');
   selector.setAttribute('aria-label', 'Hoja del libro');
   hojas.forEach((hoja, indice) => { const opcion = elemento('option', hoja.getAttribute('name') || 'Hoja ' + (indice + 1)); opcion.value = indice; selector.append(opcion); });
@@ -175,6 +188,7 @@ function mostrarExcel(archivos) {
   for (const boton of [anterior, siguiente, izquierda, derecha]) boton.type = 'button';
   controles.append(selector, anterior, siguiente, izquierda, derecha, posicion);
   controles.hidden = false;
+  // Estado de Excel: celdas dispersas por coordenadas y posición visible actual.
   let filas = new Map();
   let maxFila = 0;
   let maxColumna = 0;
@@ -211,6 +225,7 @@ function mostrarExcel(archivos) {
       for (const celda of descendientes(documento, 'c')) {
         const referencia = celda.getAttribute('r'); const columna = indiceColumna(referencia); const fila = Number(referencia.match(/\d+$/)[0]);
         if (columna > 16383 || fila < 1 || fila > 1048576) throw new Error('La hoja contiene coordenadas inválidas.');
+        // Interpreta texto compartido, texto directo, booleanos y números; no calcula fórmulas.
         const tipo = celda.getAttribute('t'); const valor = descendientes(celda, 'v')[0]?.textContent;
         let texto = tipo === 's' ? textos[Number(valor)] ?? '' : tipo === 'inlineStr' ? textoCompleto(celda) : tipo === 'b' ? (valor === '1' ? 'VERDADERO' : 'FALSO') : !tipo || tipo === 'n' ? formatear(valor, celda.getAttribute('s')) ?? '' : valor ?? '';
         if (!texto && descendientes(celda, 'f').length) texto = '=' + descendientes(celda, 'f')[0].textContent;
@@ -221,6 +236,7 @@ function mostrarExcel(archivos) {
       dibujar(); estado.textContent = '';
     } catch (error) { contenido.replaceChildren(); estado.textContent = error.message; }
   }
+  // Conecta controles para cambiar de hoja o avanzar por la tabla visible.
   selector.addEventListener('change', cambiarHoja);
   anterior.addEventListener('click', () => { filaInicial = Math.max(1, filaInicial - 100); dibujar(); });
   siguiente.addEventListener('click', () => { filaInicial += 100; dibujar(); });
@@ -235,12 +251,14 @@ try {
   if (!respuesta.ok) throw new Error('No se pudo abrir el documento. Comprueba tu sesión.');
   const datos = new Uint8Array(await respuesta.arrayBuffer());
   if (datos.length > 10 * 1024 * 1024) throw new Error('El archivo supera el límite de lectura.');
+  // Selecciona lector según la extensión enviada por la vista; TXT se presenta como texto literal.
   if (visor.dataset.formato === 'txt') contenido.append(elemento('pre', lector.decode(datos), 'texto-documento'));
   else if (visor.dataset.formato === 'docx') mostrarWord(extraer(datos));
   else if (visor.dataset.formato === 'xlsx') mostrarExcel(extraer(datos));
   else throw new Error('Este formato no está admitido.');
   if (estado.textContent === 'Cargando documento…') estado.textContent = '';
   visor.dataset.renderizado = estado.textContent ? 'false' : 'true';
+// Limpia la vista parcial ante errores y ofrece descargar; finally marca el fin de la carga.
 } catch (error) {
   contenido.replaceChildren(); controles.hidden = true;
   estado.textContent = (error instanceof Error ? error.message : 'No se pudo mostrar el documento.') + ' Puedes descargarlo para abrirlo.';

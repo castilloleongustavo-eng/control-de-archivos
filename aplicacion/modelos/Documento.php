@@ -1,4 +1,10 @@
 <?php
+/**
+ * Archivo: aplicacion/modelos/Documento.php
+ * Propósito: Centraliza las consultas SQL de los documentos.
+ * Funcionamiento: Lee y modifica metadatos con parámetros preparados; las operaciones web incluyen al propietario en sus consultas.
+ */
+
 declare(strict_types=1);
 namespace Aplicacion\Modelos;
 use Aplicacion\Nucleo\Conexion;
@@ -21,6 +27,7 @@ final class Documento
         // Los filtros solo se agregan cuando tienen valor. Los comodines del texto se escapan para buscar literalmente.
         if ($busqueda !== '') { $sql .= " AND nombre_original LIKE ? ESCAPE '='"; $parametros[] = '%' . strtr($busqueda, ['=' => '==', '%' => '=%', '_' => '=_']) . '%'; }
         if ($tipo !== '') { $sql .= ' AND extension=?'; $parametros[] = $tipo; }
+        // Paginación: convierte el número de página en la cantidad de filas que debe saltar la consulta.
         $desplazamiento = (max(1, min(100000, $pagina)) - 1) * 25;
         // OFFSET se calcula con enteros acotados; los datos escritos por el usuario siguen siendo parámetros preparados.
         $consulta = Conexion::obtener()->prepare($sql . ' ORDER BY fecha_carga DESC, id_documento DESC LIMIT 25 OFFSET ' . $desplazamiento);
@@ -30,6 +37,7 @@ final class Documento
     /** Recibe el propietario y devuelve cantidades y bytes de su espacio sin consultar otras cuentas. */
     public static function estadisticas(int $usuario): array
     {
+        // Agregación SQL: calcula cantidad de documentos, suma de bytes y cantidad de extensiones distintas.
         $consulta = Conexion::obtener()->prepare('SELECT COUNT(*) AS total, COALESCE(SUM(tamano_bytes),0) AS utilizado, COUNT(DISTINCT extension) AS tipos FROM documentos WHERE id_usuario=?');
         $consulta->execute([$usuario]); return $consulta->fetch();
     }

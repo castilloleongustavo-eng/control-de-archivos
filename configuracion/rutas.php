@@ -1,7 +1,14 @@
 <?php
+/**
+ * Archivo: configuracion/rutas.php
+ * Propósito: Calcula las ubicaciones del código y del almacenamiento privado.
+ * Funcionamiento: Normaliza rutas absolutas, impide guardar datos dentro del proyecto y devuelve el mapa RUTAS utilizado por la aplicación.
+ */
+
 declare(strict_types=1);
 /** Separa código, configuración local y datos privados; los datos de ejecución siempre son externos. */
 $raiz = dirname(__DIR__);
+// La ubicación depende del sistema operativo; RUTA_DATOS permite elegir otro directorio privado.
 $predeterminada = PHP_OS_FAMILY === 'Windows' ? 'C:/AlmacenamientoPrivado/GestorArchivos' : sys_get_temp_dir() . '/gestor-documentos';
 $almacenamiento = rtrim(getenv('RUTA_DATOS') ?: $predeterminada, '/\\');
 // Se normalizan segmentos para rechazar incluso rutas como «proyecto/otro/../temporal».
@@ -25,6 +32,7 @@ $comprobar = static function (string $ruta) use ($raiz, $normalizar): string {
 // La configuración puede estar en el proyecto, pero nunca en la carpeta que Apache publica.
 $publicoNormalizado = $normalizar($raiz . '/publico');
 if (str_starts_with($normalizar(ARCHIVO_ENTORNO), $publicoNormalizado . '/')) throw new RuntimeException('La configuración no puede estar en publico/.');
+// Mapa final: las demás capas consultan estas claves en lugar de repetir rutas físicas.
 return [
     'raiz' => $raiz,
     'aplicacion' => $raiz . '/aplicacion',

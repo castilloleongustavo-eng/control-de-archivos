@@ -1,6 +1,12 @@
+/**
+ * Archivo: publico/recursos/scripts/vista_pdf.js
+ * Propósito: Dibuja las páginas PDF dentro de la aplicación.
+ * Funcionamiento: Configura PDF.js y su worker local, carga el documento autorizado y atiende los botones anterior y siguiente.
+ */
 import { getDocument, GlobalWorkerOptions } from '/recursos/externos/pdfjs/build/pdf.mjs';
 /** Integra la API externa sin traducir sus propiedades obligatorias ni activar scripts PDF. */
 GlobalWorkerOptions.workerSrc = '/recursos/externos/pdfjs/build/pdf.worker.mjs';
+// Referencias al canvas, botones e indicadores definidos en vista_previa.php.
 const visor = document.getElementById('visor-pdf');
 const lienzo = document.getElementById('lienzo-pdf');
 const anterior = document.getElementById('pdf-anterior');
@@ -33,9 +39,11 @@ async function dibujarPagina(numeroPagina) {
   } catch { estado.textContent = 'No pudimos mostrar esta página. Puedes descargar el documento para abrirlo.'; }
   finally { dibujando = false; anterior.disabled = paginaActual <= 1; siguiente.disabled = paginaActual >= documentoPdf.numPages; }
 }
+// Los controles solicitan una página; dibujarPagina bloquea los botones durante el renderizado.
 anterior.addEventListener('click', () => dibujarPagina(paginaActual - 1));
 siguiente.addEventListener('click', () => dibujarPagina(paginaActual + 1));
 try {
+  // Carga con credenciales y recursos locales; desactiva evaluación dinámica y WebAssembly.
   documentoPdf = await getDocument({ url: visor.dataset.origen, withCredentials: true, isEvalSupported: false, disableFontFace: true, useWasm: false, cMapUrl: '/recursos/externos/pdfjs/cmaps/', cMapPacked: true, standardFontDataUrl: '/recursos/externos/pdfjs/standard_fonts/' }).promise;
   await dibujarPagina(1);
 } catch { contador.textContent = 'Vista previa no disponible'; estado.textContent = 'El documento está protegido o no se pudo mostrar. Descárgalo para abrirlo con tu aplicación.'; }

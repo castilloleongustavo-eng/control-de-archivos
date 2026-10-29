@@ -1,4 +1,10 @@
 <?php
+/**
+ * Archivo: aplicacion/intermediarios/Seguridad.php
+ * Propósito: Reúne los controles de seguridad de las peticiones web.
+ * Funcionamiento: Envía cabeceras HTTP, obtiene la identidad de la sesión y valida el token CSRF de los formularios.
+ */
+
 declare(strict_types=1);
 namespace Aplicacion\Intermediarios;
 use Aplicacion\Nucleo\{Sesion, ExcepcionHttp};
@@ -8,6 +14,7 @@ final class Seguridad
     /** Envía CSP, nosniff y políticas de privacidad antes de producir contenido. */
     public static function cabeceras(): void
     {
+        // La política CSP restringe los recursos al sitio y bloquea objetos incrustados y formularios dirigidos a otros orígenes.
         header("Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; frame-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'");
         header('X-Content-Type-Options: nosniff');
         header('X-Frame-Options: DENY');
@@ -19,6 +26,7 @@ final class Seguridad
     /** Devuelve el ID autenticado o redirige al login; ignora IDs enviados por el cliente. */
     public static function usuario(): int
     {
+        // Las rutas privadas obtienen la identidad desde la sesión; sin ella se solicita iniciar sesión.
         if (empty($_SESSION['usuario'])) redirigir('/ingresar');
         return (int)$_SESSION['usuario']['id_usuario'];
     }

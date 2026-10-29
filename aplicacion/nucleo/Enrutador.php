@@ -1,4 +1,10 @@
 <?php
+/**
+ * Archivo: aplicacion/nucleo/Enrutador.php
+ * Propósito: Relaciona cada dirección y método HTTP con su controlador.
+ * Funcionamiento: Aplica controles comunes, atiende rutas GET y POST y valida los identificadores de las operaciones de documentos.
+ */
+
 declare(strict_types=1);
 namespace Aplicacion\Nucleo;
 use Aplicacion\Controladores\{ControladorAutenticacion,ControladorDocumentos};
@@ -9,6 +15,7 @@ final class Enrutador
     /** Interpreta método y ruta HTTP; rechaza identificadores, métodos y cuerpos inválidos. */
     public function despachar(): void
     {
+        // Separa la ruta de los parámetros de búsqueda y obtiene el método HTTP enviado por el navegador.
         $ruta=parse_url($_SERVER['REQUEST_URI'],PHP_URL_PATH); $metodo=$_SERVER['REQUEST_METHOD'];
         // Antes de despachar se limita el cuerpo, se exige sesión en rutas privadas y se valida CSRF para cada POST.
         if ($metodo==='POST' && (int)($_SERVER['CONTENT_LENGTH']??0)>PARAMETROS_SEGURIDAD['limite_cuerpo_bytes']) throw new ExcepcionHttp(413,'La solicitud supera el tamaño permitido. Máximo 10 MB por archivo.');
@@ -25,6 +32,7 @@ final class Enrutador
                 case '/documentos/subir': $documentos->formularioCarga(); return;
             }
         }
+        // Las rutas POST procesan cambios: ingreso, registro, cierre de sesión y carga de documentos.
         if ($metodo==='POST') {
             switch ($ruta) {
                 case '/ingresar': $autenticacion->ingresar(); return;
@@ -33,6 +41,7 @@ final class Enrutador
                 case '/documentos/subir': $documentos->subir(); return;
             }
         }
+        // Extrae el documento y la acción de la URL; cada controlador comprueba la propiedad antes de operar.
         if (preg_match('#^/documentos/([a-f0-9]{32})/(ver|descargar|vista-previa|eliminar)$#D',(string)$ruta,$coincidencias)) {
             // La expresión extrae un ID hexadecimal de longitud fija y una operación conocida.
             $operacion=$coincidencias[2]; $identificador=$coincidencias[1];
@@ -40,6 +49,7 @@ final class Enrutador
             if ($operacion!=='eliminar' && $metodo==='GET') { if ($operacion==='vista-previa') $documentos->vistaPrevia($identificador); else $documentos->transmitir($identificador,$operacion==='descargar'); return; }
             header('Allow: '.($operacion==='eliminar'?'POST':'GET')); throw new ExcepcionHttp(405,'Método no permitido.');
         }
+        // Si ninguna ruta coincide, informa que la dirección solicitada no existe.
         throw new ExcepcionHttp(404,'La página o el archivo no está disponible.');
     }
 }

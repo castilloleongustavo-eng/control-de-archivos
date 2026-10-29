@@ -1,6 +1,13 @@
 <?php
+/**
+ * Archivo: aplicacion/inicio.php
+ * Propósito: Inicializa los recursos compartidos de toda la aplicación.
+ * Funcionamiento: Lee el entorno, registra la carga de clases, prepara directorios privados y define funciones de presentación.
+ */
+
 declare(strict_types=1);
 /** Prepara el entorno antes de atender peticiones: configuración, autocarga, rutas y utilidades. */
+// Punto de referencia para resolver archivos sin depender de la carpeta desde la que se ejecuta PHP.
 define('RAIZ', dirname(__DIR__));
 // DOCUMENTOS_ENTORNO permite otra instalación; por defecto se lee el archivo privado de configuracion/.
 define('ARCHIVO_ENTORNO', getenv('DOCUMENTOS_ENTORNO') ?: RAIZ . '/configuracion/configuracion.env');
@@ -10,6 +17,7 @@ foreach (is_file(ARCHIVO_ENTORNO) ? file(ARCHIVO_ENTORNO, FILE_IGNORE_NEW_LINES 
     [$clave, $valor] = explode('=', $linea, 2);
     if (getenv(trim($clave)) === false) putenv(trim($clave) . '=' . trim($valor));
 }
+// Carga automática: busca cada clase de Aplicacion en su carpeta solo cuando se utiliza.
 spl_autoload_register(function (string $clase): void {
     /** Resuelve únicamente clases propias; el espacio de nombres determina su responsabilidad. */
     if (!str_starts_with($clase, 'Aplicacion\\')) return;
@@ -19,6 +27,7 @@ spl_autoload_register(function (string $clase): void {
     $ruta = RAIZ . '/aplicacion/' . implode('/', $partes) . '.php';
     if (is_file($ruta)) require $ruta;
 });
+// Configuración compartida: rutas físicas, límites de seguridad y catálogo de formatos.
 define('RUTAS', require RAIZ . '/configuracion/rutas.php');
 define('PARAMETROS_SEGURIDAD', require RAIZ . '/configuracion/seguridad/parametros.php');
 define('FORMATOS_PERMITIDOS', require RAIZ . '/configuracion/almacenamiento/formatos.php');
@@ -26,6 +35,7 @@ foreach (['documentos', 'sesiones', 'registros', 'temporal'] as $directorio) {
     // Solo estas carpetas de datos se crean al ejecutar; todas quedan fuera del proyecto.
     if (!is_dir(RUTAS[$directorio]) && !mkdir(RUTAS[$directorio], 0700, true)) throw new RuntimeException('No se pudo preparar el almacenamiento interno.');
 }
+// Fechas de Guatemala y errores técnicos enviados al registro privado.
 date_default_timezone_set('America/Guatemala');
 ini_set('display_errors', '0');
 ini_set('log_errors', '1');

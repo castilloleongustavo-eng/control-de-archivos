@@ -1,7 +1,13 @@
+/**
+ * Archivo: publico/recursos/scripts/navegacion.js
+ * Propósito: Controla la apertura y contracción del sidebar.
+ * Funcionamiento: Sincroniza clases, accesibilidad, foco de teclado y preferencia local para escritorio.
+ */
 'use strict';
 
 /** Navegación exclusivamente visual: no consulta datos ni cambia rutas, formularios o sesión. */
 (() => {
+  // Obtiene controles de estructura.php; sin ellos el script termina.
   const barra = document.getElementById('navegacion-lateral');
   const alternar = document.getElementById('alternar-navegacion');
   const cerrar = document.getElementById('cerrar-navegacion');
@@ -30,6 +36,7 @@
   function cerrarMenu() {
     abierta = false; actualizar(); alternar.focus();
   }
+  // Abre el menú en móvil o alterna su anchura y recuerda la preferencia en escritorio.
   alternar.addEventListener('click', () => {
     if (consultaMovil.matches) {
       abierta = !abierta; actualizar();
@@ -45,6 +52,7 @@
   barra.querySelectorAll('nav a').forEach(enlace => enlace.addEventListener('click', () => {
     if (consultaMovil.matches) { abierta = false; actualizar(); }
   }));
+  // En el panel móvil abierto, Escape cierra y Tab mantiene el foco dentro del menú.
   document.addEventListener('keydown', evento => {
     if (!consultaMovil.matches || !abierta) return;
     if (evento.key === 'Escape') { evento.preventDefault(); cerrarMenu(); }
@@ -55,6 +63,7 @@
       else if (!evento.shiftKey && document.activeElement === ultimo) { evento.preventDefault(); primero.focus(); }
     }
   });
+  // Al cambiar el ancho cierra el menú móvil y recalcula clases y atributos.
   consultaMovil.addEventListener('change', () => { abierta = false; actualizar(); });
   actualizar();
 })();

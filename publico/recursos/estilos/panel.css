@@ -1,4 +1,10 @@
+/**
+ * Archivo: publico/recursos/estilos/panel.css
+ * Propósito: Define la distribución del panel y el sidebar.
+ * Funcionamiento: Posiciona menú y cabecera, distribuye estadísticas y adapta la navegación a escritorio, tabletas y teléfonos.
+ */
 /* Navegación lateral contraíble y barra superior independiente. */
+/* Sidebar fijo: distribuye marca, navegación y pie en una columna a la izquierda. */
 .barra-lateral { position: fixed; inset: 0 auto 0 0; z-index: 60; display: flex; flex-direction: column; width: var(--ancho-menu); height: 100dvh; padding: 29px 18px 21px; color: #cbd5e1; background: var(--azul-oscuro); transition: width .2s ease, transform .2s ease; }
 .cabecera-navegacion { display: flex; align-items: center; justify-content: space-between; min-height: 43px; padding-inline: 7px; }
 .cabecera-navegacion .marca { gap: 11px; font-size: 20px; color: white; }
@@ -6,6 +12,7 @@
 .cerrar-navegacion { display: none; }
 .etiqueta-espacio { padding: 0 15px; margin: 42px 0 16px; color: #738298; font-size: 9px; font-weight: 600; letter-spacing: 1.8px; white-space: nowrap; }
 .barra-lateral nav { display: grid; gap: 7px; overflow-x: hidden; overflow-y: auto; }
+/* Enlaces del sidebar: espaciado, icono y estados hover y active de la sección actual. */
 .enlace-navegacion { position: relative; display: flex; align-items: center; gap: 12px; min-height: 46px; padding: 12px 15px; border-radius: 8px; color: #aebccd; font-size: 13px; font-weight: 500; white-space: nowrap; transition: background-color .16s, color .16s; }
 .enlace-navegacion .icono-interfaz { width: 20px; height: 20px; }
 .enlace-navegacion:hover { background: rgb(255 255 255 / 6%); color: white; }
@@ -18,6 +25,7 @@
 .nota-privacidad strong { color: #e2e8f0; font-size: 12px; font-weight: 600; }
 .nota-privacidad p { margin: 6px 0 0; color: #94a3b8; font-size: 11px; line-height: 1.7; }
 .firma-navegacion { display: block; margin: 18px 0 0; text-align: center; color: #6f7f95; font-size: 10px; }
+/* El contenido deja un margen igual al menú y la cabecera permanece visible al desplazarse. */
 .estructura-aplicacion { min-width: 0; margin-left: var(--ancho-menu); transition: margin-left .2s ease; }
 .barra-superior { position: sticky; top: 0; z-index: 30; display: flex; align-items: center; justify-content: space-between; gap: 20px; height: 82px; padding: 0 34px; border-bottom: 1px solid var(--borde); background: var(--superficie); }
 .seccion-actual { display: flex; align-items: center; gap: 17px; min-width: 0; }
@@ -25,6 +33,7 @@
 .seccion-actual strong { display: block; font-size: 14px; font-weight: 600; white-space: nowrap; }
 .acciones-cabecera { display: flex; align-items: center; gap: 22px; }
 .etiqueta-privacidad { display: inline-flex; align-items: center; font-size: 10px; color: var(--texto-secundario); white-space: nowrap; }
+/* Usuario, avatar y controles de cierre de sesión de la cabecera. */
 .perfil { display: flex; gap: 10px; align-items: center; padding-left: 22px; border-left: 1px solid var(--borde); }
 .avatar { display: grid; width: 36px; height: 36px; flex: 0 0 36px; place-items: center; background: #eff6ff; border: 1px solid #dbeafe; border-radius: 50%; color: var(--azul); font-size: 13px; font-weight: 650; }
 .perfil strong { display: block; max-width: 145px; overflow: hidden; text-overflow: ellipsis; font-size: 12px; font-weight: 600; }
@@ -34,6 +43,7 @@
 .cerrar-sesion button:hover { background: #fef2f2; border-color: #fecaca; color: #b91c1c; }
 .cerrar-sesion .icono-interfaz { width: 17px; height: 17px; }
 .fondo-navegacion { display: none; }
+/* Contraído en escritorio: reduce el menú y oculta textos manteniendo los nombres accesibles. */
 .navegacion-contraida .barra-lateral { width: var(--ancho-menu-contraido); padding-inline: 13px; }
 .navegacion-contraida .estructura-aplicacion { margin-left: var(--ancho-menu-contraido); }
 .navegacion-contraida .cabecera-navegacion { padding-inline: 9px; }
@@ -48,6 +58,7 @@
 .encabezado-pagina h1 { margin: 8px 0 10px; font-size: 31px; font-weight: 650; line-height: 1.2; letter-spacing: -1px; }
 .encabezado-pagina p { margin: 0; color: var(--texto-secundario); font-size: 13px; line-height: 1.7; }
 .encabezado-pagina > .btn { margin-top: 12px; }
+/* Estadísticas en tres columnas con cantidades e iconos. */
 .cuadricula-estadisticas { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; margin-bottom: 24px; scroll-margin-top: 110px; }
 .tarjeta-estadistica { position: relative; display: flex; justify-content: space-between; gap: 12px; padding: 22px 23px; border: 1px solid var(--borde); border-radius: var(--radio); background: var(--superficie); box-shadow: var(--sombra); }
 .etiqueta-estadistica { display: block; margin-bottom: 4px; font-size: 12px; color: var(--texto-secundario); font-weight: 500; }
@@ -78,6 +89,7 @@
   .perfil { border: 0; padding: 0; }
   .tarjeta-estadistica { padding: 20px; }
 }
+/* En móvil el menú se desplaza fuera de pantalla y se abre sobre un fondo de cierre. */
 @media (max-width: 960px) {
   .barra-lateral { width: 270px; transform: translateX(-100%); padding: 24px 18px; }
   .navegacion-abierta .barra-lateral { transform: translateX(0); }
@@ -92,6 +104,7 @@
   .barra-superior { height: 72px; padding-inline: 24px; }
   .espacio { min-height: calc(100dvh - 72px); padding: 28px 24px 20px; }
 }
+/* En teléfonos compacta la cabecera y muestra estadísticas en una columna. */
 @media (max-width: 620px) {
   .barra-superior { height: 68px; padding-inline: 17px; gap: 12px; }
   .seccion-actual { gap: 11px; }

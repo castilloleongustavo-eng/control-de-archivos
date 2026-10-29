@@ -1,4 +1,10 @@
 <?php
+/**
+ * Archivo: aplicacion/nucleo/ExcepcionHttp.php
+ * Propósito: Representa un error que puede mostrarse al usuario.
+ * Funcionamiento: Transporta el estado HTTP y el mensaje público hasta el manejador de errores de publico/index.php.
+ */
+
 declare(strict_types=1);
 namespace Aplicacion\Nucleo;
 /** Error público con estado HTTP; las trazas técnicas permanecen en registros privados. */

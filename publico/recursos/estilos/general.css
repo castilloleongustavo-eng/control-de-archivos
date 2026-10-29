@@ -1,4 +1,10 @@
+/**
+ * Archivo: publico/recursos/estilos/general.css
+ * Propósito: Define variables visuales y estilos compartidos.
+ * Funcionamiento: Configura paleta, tipografía, iconos, botones, formularios, mensajes y accesibilidad.
+ */
 /* Paleta y escala visual compartidas; no se modifican los estilos del proveedor Bootstrap. */
+/* Variables CSS reutilizables de colores, superficies, tamaños y espaciados. */
 :root {
   --azul-oscuro: #0f172a;
   --azul: #2563eb;
@@ -18,6 +24,7 @@
   --ancho-menu-contraido: 84px;
 }
 * { box-sizing: border-box; }
+/* Estilos generales del documento, tipografía, enlaces y controles nativos. */
 html { scroll-padding-top: 108px; }
 body { margin: 0; background: var(--fondo); color: var(--texto); font-family: "Segoe UI", Arial, sans-serif; font-size: 14px; line-height: 1.6; }
 button, input, select { font: inherit; }
@@ -26,10 +33,12 @@ a:hover { color: #1d4ed8; }
 button, a, input, select { -webkit-tap-highlight-color: transparent; }
 :focus-visible { outline: 3px solid var(--azul-claro); outline-offset: 4px; }
 h1, h2, h3, p { overflow-wrap: break-word; }
+/* Los iconos SVG heredan el color del texto y comparten tamaño y trazo. */
 .icono-interfaz { display: inline-block; width: 22px; height: 22px; flex: 0 0 auto; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; vertical-align: middle; }
 .texto-secundario { color: var(--texto-secundario); }
 .sobretitulo { display: block; color: var(--texto-secundario); font-size: 11px; font-weight: 650; letter-spacing: 1.7px; }
 .punto-titulo { color: var(--azul); }
+/* Enlace oculto hasta recibir foco: permite saltar directamente al contenido con el teclado. */
 .saltar-contenido { position: fixed; top: -100px; left: 20px; z-index: 200; padding: 12px 20px; background: white; border-radius: 8px; }
 .saltar-contenido:focus { top: 12px; }
 
@@ -44,6 +53,7 @@ h1, h2, h3, p { overflow-wrap: break-word; }
 .btn-danger:hover { background: #b91c1c; border-color: #b91c1c; }
 .btn-sm { min-height: 36px; padding: 6px 12px; font-size: 12px; }
 .btn:disabled { opacity: .45; }
+/* Campos compartidos y resaltado visual del foco. */
 .form-control, .form-select { min-height: 46px; border: 1px solid #cbd5e1; border-radius: 8px; padding: 11px 13px; background-color: var(--superficie); color: var(--texto); font-size: 14px; }
 .form-control::placeholder { color: #94a3b8; }
 .form-control:focus, .form-select:focus { border-color: var(--azul-claro); box-shadow: 0 0 0 3px rgb(37 99 235 / 9%); }
@@ -56,9 +66,11 @@ h1, h2, h3, p { overflow-wrap: break-word; }
 .alert-info { background: var(--azul-suave); border-color: #bfdbfe; color: #1e40af; }
 .alert-success { background: #ecfdf5; border-color: #a7f3d0; color: #047857; }
 .alert-danger { background: #fef2f2; border-color: #fecaca; color: #b91c1c; }
+/* Identidad visual de la aplicación y símbolo que la acompaña. */
 .marca { display: inline-flex; align-items: center; gap: 12px; color: inherit; font-size: 20px; font-weight: 700; letter-spacing: -.4px; line-height: 1.2; }
 .marca:hover { color: inherit; }
 .marca small { display: block; margin-top: 7px; font-size: 8px; font-weight: 500; letter-spacing: 1.7px; }
 .simbolo-marca { display: grid; width: 40px; height: 40px; flex: 0 0 40px; place-items: center; border-radius: 11px; color: white; background: var(--azul); }
 .simbolo-marca .icono-interfaz { width: 24px; height: 24px; }
+/* Respeta la preferencia del sistema para reducir animaciones y transiciones. */
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; animation: none !important; scroll-behavior: auto !important; } }

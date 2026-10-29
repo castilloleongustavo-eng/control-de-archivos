@@ -1,5 +1,12 @@
+# Archivo: publico/.htaccess
+# Propósito: Define la entrada de rutas cuando Apache permite utilizar este archivo.
+# Funcionamiento: Desactiva listados de carpetas y reescribe hacia index.php las peticiones que no apuntan a un archivo existente.
+
+# Evita listados de carpetas y la resolución automática de variantes de una ruta.
 Options -Indexes -MultiViews
+# Al solicitar un directorio busca index.php como entrada.
 DirectoryIndex index.php
+# Las rutas que no sean archivos pasan al enrutador conservando los parámetros de consulta.
 RewriteEngine On
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteRule ^ index.php [QSA,L]

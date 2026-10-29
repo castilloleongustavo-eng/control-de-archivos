@@ -1,4 +1,10 @@
 <?php
+/**
+ * Archivo: aplicacion/modelos/Usuario.php
+ * Propósito: Centraliza las consultas SQL de las cuentas.
+ * Funcionamiento: Busca identidades, crea usuarios con contraseñas convertidas en hashes y renueva esos hashes cuando corresponde.
+ */
+
 declare(strict_types=1);
 namespace Aplicacion\Modelos;
 use Aplicacion\Nucleo\Conexion;
@@ -8,12 +14,14 @@ final class Usuario
     /** Busca por usuario o correo mediante parámetros preparados; devuelve fila o false. */
     public static function buscar(string $acceso): array|false
     {
+        // Los signos de interrogación son parámetros: los datos del usuario se envían separados de la sentencia SQL.
         $consulta = Conexion::obtener()->prepare('SELECT * FROM usuarios WHERE nombre_usuario=? OR correo=? LIMIT 1');
         $consulta->execute([$acceso, $acceso]); return $consulta->fetch();
     }
     /** Guarda un usuario validado por el controlador; los índices únicos resuelven carreras. */
     public static function crear(string $nombre, string $correo, string $contrasena): void
     {
+        // password_hash produce el valor almacenado; la contraseña original no se guarda en la tabla.
         Conexion::obtener()->prepare('INSERT INTO usuarios (nombre_usuario,correo,hash_contrasena) VALUES (?,?,?)')->execute([$nombre, $correo, password_hash($contrasena, PASSWORD_DEFAULT)]);
     }
     /** Actualiza el hash de un usuario ya autenticado cuando cambia el algoritmo recomendado. */

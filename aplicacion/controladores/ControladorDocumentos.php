@@ -1,4 +1,10 @@
 <?php
+/**
+ * Archivo: aplicacion/controladores/ControladorDocumentos.php
+ * Propósito: Atiende las pantallas y operaciones de documentos del usuario.
+ * Funcionamiento: Solicita datos a Documento, delega los archivos físicos a AlmacenDocumentos y muestra listados, cargas o vistas previas.
+ */
+
 declare(strict_types=1);
 namespace Aplicacion\Controladores;
 use Aplicacion\Nucleo\{Vista, Sesion, ExcepcionHttp};
@@ -16,6 +22,7 @@ final class ControladorDocumentos
         $busqueda = mb_substr(trim((string)($_GET['busqueda'] ?? '')), 0, 180);
         $tipo = substr((string)($_GET['tipo'] ?? ''), 0, 5);
         $pagina = max(1, (int)($_GET['pagina'] ?? 1));
+        // Entrega a la vista los documentos filtrados y las estadísticas de la misma cuenta.
         Vista::mostrar('documentos/listado', ['titulo' => $resumen ? 'Resumen' : 'Mis archivos', 'resumen' => $resumen, 'documentos' => Documento::listar($usuario,$busqueda,$tipo,$pagina), 'estadisticas' => Documento::estadisticas($usuario), 'busqueda' => $busqueda, 'tipo' => $tipo, 'pagina' => $pagina]);
     }
     /** Comprueba sesión y muestra el formulario de carga protegido con CSRF. */
@@ -41,11 +48,13 @@ final class ControladorDocumentos
         $documento = Documento::delPropietario($identificador, Seguridad::usuario());
         if (!$documento) throw new ExcepcionHttp(404, 'Archivo no disponible.');
         $ruta = (new AlmacenDocumentos())->ruta($documento);
+        // Abre el archivo físico después de comprobar sesión, propietario y ruta privada.
         $recurso = fopen($ruta, 'rb');
         // No se envían cabeceras del archivo hasta confirmar que se pudo abrir el binario autorizado.
         if ($recurso === false) throw new ExcepcionHttp(404, 'Archivo no disponible.');
         $enLinea = !$descargar && in_array($documento['tipo_mime'], ['application/pdf','image/jpeg','image/png'], true);
         // PDF e imágenes pueden abrirse directamente. Office y TXT se leen con fetch en el visor de la aplicación.
+        // Describe al navegador el tipo real, nombre y tamaño del archivo que recibirá.
         header('Content-Type: ' . $documento['tipo_mime']);
         header("Content-Disposition: " . ($enLinea ? 'inline' : 'attachment') . "; filename=\"archivo." . $documento['extension'] . "\"; filename*=UTF-8''" . rawurlencode($documento['nombre_original']));
         header('Content-Length: ' . fstat($recurso)['size']);

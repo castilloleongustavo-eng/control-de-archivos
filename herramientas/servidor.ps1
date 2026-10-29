@@ -1,3 +1,7 @@
+# Archivo: herramientas/servidor.ps1
+# Propósito: Inicia, consulta, detiene o valida el servidor Apache local.
+# Funcionamiento: Prepara PHP y rutas privadas, comprueba MariaDB, genera la configuración y verifica que la página de ingreso responda.
+
 <#
 .SYNOPSIS
 Inicia, detiene o valida la instancia Apache local del proyecto.
@@ -11,14 +15,14 @@ Puerto HTTP local. El valor predeterminado es 8088.
 [CmdletBinding()]
 param([ValidateSet('iniciar','detener','estado','validar')][string]$Accion='iniciar',[string]$Xampp='C:\xampp',[int]$Puerto=8088)
 $ErrorActionPreference='Stop'
-$directorioPhp=Join-Path $PSScriptRoot 'ejecucion\php-8.5.12'
-$php=Join-Path $directorioPhp 'php.exe'
-if (!(Test-Path -LiteralPath $php)) { throw 'Falta el PHP local: herramientas/ejecucion/php-8.5.12/php.exe.' }
+# Carga la preparación compartida de PHP antes de ejecutar los diagnósticos.
+. (Join-Path $PSScriptRoot 'entorno-php.ps1')
 # PHP lee configuracion/configuracion.env; Apache y las cargas escriben sus datos fuera del proyecto.
 $rutas=(& $php (Join-Path $PSScriptRoot 'diagnostico\rutas.php')) | ConvertFrom-Json
 if ($LASTEXITCODE -ne 0 -or !$rutas.temporal) { throw 'No se pudieron resolver las rutas externas.' }
 $configuracion=Join-Path $rutas.temporal 'apache-local.conf'
 $archivoPid=Join-Path $rutas.temporal 'apache-local.pid'
+# Identifica la instancia por su PID y línea de comandos para no afectar otros servidores Apache.
 $proceso=$null
 if (Test-Path -LiteralPath $archivoPid) {
     $identificador=0
@@ -28,11 +32,13 @@ if (Test-Path -LiteralPath $archivoPid) {
             $candidato.CommandLine.Replace('\','/').ToLowerInvariant().Contains($configuracion.Replace('\','/').ToLowerInvariant())) { $proceso=$candidato }
     }
 }
+# Consulta: informa si el proceso identificado está activo y termina.
 if ($Accion -eq 'estado') {
     if ($proceso) { Write-Output "Servidor activo: http://127.0.0.1:$Puerto/ingresar" }
     else { Write-Output 'Servidor del proyecto detenido.' }
     exit 0
 }
+# Detención: finaliza solo la instancia identificada y sus procesos hijos Apache.
 if ($Accion -eq 'detener') {
     # Se verifica el PID y su configuración antes de detener solo esta instancia, nunca el Apache global de XAMPP.
     if (!$proceso) { Write-Output 'La instancia ya esta detenida.'; exit 0 }
@@ -43,6 +49,7 @@ if ($Accion -eq 'detener') {
     exit 0
 }
 if (!(Test-Path -LiteralPath $rutas.entorno)) { throw 'Ejecuta primero herramientas/configurar.ps1 para crear la conexion privada.' }
+# Antes de iniciar o validar comprueba PHP, extensiones y lectura de las tablas requeridas.
 & $php (Join-Path $PSScriptRoot 'diagnostico\verificar_php.php') --conexion
 if ($LASTEXITCODE -ne 0) { throw 'Revisa MySQL en XAMPP y configuracion/configuracion.env.' }
 if ($proceso -and $Accion -eq 'iniciar') { Write-Output "Servidor ya activo: http://127.0.0.1:$Puerto/ingresar"; exit 0 }
@@ -54,6 +61,7 @@ $pidRuta=$archivoPid.Replace('\','/')
 $registro=(Join-Path $rutas.registros 'apache-local.log').Replace('\','/')
 $temporales=$rutas.temporal.Replace('\','/')
 # Todo archivo generado por Apache y por las cargas HTTP se escribe en el directorio externo.
+# Configuración generada: módulos Apache y PHP, puerto local, carpeta pública y reglas de acceso.
 $contenido=@"
 ServerRoot "$raizApache"
 Listen 127.0.0.1:$Puerto
@@ -103,9 +111,11 @@ $rutaAnterior=$env:PATH
 try {
     # La ruta de DLL se ajusta solo para este proceso y sus hijos; no se modifica el PATH del equipo.
     $env:PATH="$directorioPhp;$rutaAnterior"
+# La opción -t comprueba la sintaxis de Apache antes de abrir el servidor.
     & $apache -t -f $configuracion
     if ($LASTEXITCODE -ne 0) { throw 'Configuracion Apache invalida.' }
     if ($Accion -eq 'validar') { Write-Output 'PHP, base de datos y Apache verificados.'; exit 0 }
+# Inicia Apache oculto y consulta el ingreso hasta que responda o se agoten los intentos.
     Start-Process -FilePath $apache -ArgumentList @('-f',('"'+$configuracion+'"')) -WorkingDirectory $directorioPhp -WindowStyle Hidden
     for ($intento=0;$intento -lt 30;$intento++) {
         Start-Sleep -Milliseconds 200

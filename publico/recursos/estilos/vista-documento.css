@@ -1,7 +1,13 @@
+/**
+ * Archivo: publico/recursos/estilos/vista-documento.css
+ * Propósito: Define el aspecto de los lectores de TXT, Word y Excel.
+ * Funcionamiento: Delimita el desplazamiento, presenta Word como página y Excel como tabla con encabezados fijos.
+ */
 /* Lectores locales: el desplazamiento del documento queda dentro de su panel. */
 .contenido-documento { max-height: 75vh; overflow: auto; min-width: 0; scrollbar-width: thin; }
 #estado-documento:empty { display: none; }
 .texto-documento { margin: 0; padding: 24px; color: #eee; font: 14px/1.8 Consolas, monospace; white-space: pre-wrap; overflow-wrap: anywhere; tab-size: 4; }
+/* Controles Excel: selector de hoja, navegación e indicador de posición. */
 .controles-documento { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 18px; }
 .controles-documento[hidden] { display: none; }
 .selector-hoja { max-width: 240px; }
@@ -14,6 +20,7 @@
 .pagina-word img { display: inline-block; max-width: 100%; height: auto; }
 .pagina-word table { width: 100%; table-layout: fixed; border-collapse: collapse; margin: 18px 0; }
 .pagina-word td { padding: 9px 12px; border: 1px solid #ccc; vertical-align: top; }
+/* Clases de formato de texto, alineaciones y listas que asigna el lector Word. */
 .pagina-word .negrita { font-weight: bold; }
 .pagina-word .cursiva { font-style: italic; }
 .pagina-word .subrayado { text-decoration: underline; }
@@ -30,6 +37,7 @@
 .tabla-hoja thead { position: sticky; top: 0; }
 .tabla-hoja tbody th { position: sticky; left: 0; min-width: 45px; }
 .tabla-hoja tbody tr:nth-child(even) td { background: rgb(255 255 255 / 3%); }
+/* Reduce márgenes de lectura en pantallas pequeñas. */
 @media (max-width: 620px) {
   .pagina-word { padding: 24px 20px; font-size: 14px; }
   .texto-documento { padding: 10px; font-size: 12px; }

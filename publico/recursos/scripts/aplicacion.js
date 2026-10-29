@@ -1,5 +1,11 @@
+/**
+ * Archivo: publico/recursos/scripts/aplicacion.js
+ * Propósito: Gestiona las interacciones de formularios y documentos.
+ * Funcionamiento: Permite ver la contraseña, confirmar eliminaciones y seleccionar o arrastrar un archivo antes de enviarlo.
+ */
 'use strict';
 /** Mejora los formularios sin sustituir ninguna validación ni autorización del servidor. */
+// Contraseña: conecta los botones Ver con su campo mediante aria-controls.
 document.querySelectorAll('.alternar-contrasena').forEach(boton => {
   // aria-controls relaciona cada botón con su campo; cambiar el tipo no modifica el valor escrito.
   boton.addEventListener('click', () => {
@@ -10,6 +16,7 @@ document.querySelectorAll('.alternar-contrasena').forEach(boton => {
     boton.setAttribute('aria-label', mostrar ? 'Ocultar contraseña' : 'Mostrar contraseña');
   });
 });
+// Eliminación: prepara el diálogo, la ruta POST y la devolución del foco al botón original.
 const dialogo = document.getElementById('dialogo-eliminar');
 // Se conserva el control de origen para devolverle el foco al cerrar el diálogo.
 let focoAnterior;
@@ -24,6 +31,7 @@ document.querySelectorAll('[data-eliminar-id]').forEach(boton => {
 });
 document.getElementById('cancelar-eliminacion')?.addEventListener('click', () => dialogo.close());
 dialogo?.addEventListener('close', () => focoAnterior?.focus());
+// Carga: obtiene el selector de archivo y los elementos que muestran su estado.
 const entrada = document.getElementById('documento');
 // Estos elementos solo existen en la pantalla de carga; los encadenamientos opcionales evitan errores en las demás.
 const zona = document.getElementById('zona-carga');
@@ -34,12 +42,14 @@ function mostrarSeleccion() {
   entrada.setCustomValidity(archivo && archivo.size > 10485760 ? 'El archivo supera el máximo de 10 MB.' : '');
 }
 entrada?.addEventListener('change', mostrarSeleccion);
+// Arrastre: evita la navegación del navegador y resalta visualmente la zona de carga.
 zona?.addEventListener('dragover', evento => { evento.preventDefault(); zona.classList.add('arrastrando'); });
 zona?.addEventListener('dragleave', () => zona.classList.remove('arrastrando'));
 zona?.addEventListener('drop', evento => {
   evento.preventDefault(); zona.classList.remove('arrastrando');
   if (evento.dataTransfer.files.length === 1) { entrada.files = evento.dataTransfer.files; mostrarSeleccion(); }
 });
+// Durante el envío desactiva Guardar para evitar pulsaciones repetidas.
 document.getElementById('formulario-carga')?.addEventListener('submit', () => {
   const boton = document.getElementById('guardar-documento'); boton.disabled = true; boton.textContent = 'Guardando archivo…';
 });

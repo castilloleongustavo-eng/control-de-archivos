@@ -1,0 +1,29 @@
+; Plantilla de referencia. El script herramientas/preparar-php.ps1 genera el php.ini real.
+; Sustituir las dos rutas de ejemplo por ubicaciones absolutas antes de utilizarla.
+[PHP]
+extension_dir="RUTA_ABSOLUTA_PHP/ext"
+extension=pdo_mysql
+extension=fileinfo
+extension=mbstring
+extension=openssl
+extension=zip
+
+; Cargas: 10 MB para el documento y margen para los campos del cuerpo multipart.
+file_uploads=On
+upload_max_filesize=10M
+post_max_size=12M
+max_file_uploads=1
+memory_limit=128M
+max_execution_time=30
+
+; Los errores técnicos se guardan en disco; no se muestran en las páginas.
+display_errors=Off
+log_errors=On
+error_log="RUTA_ABSOLUTA_REGISTROS/php.log"
+expose_php=Off
+allow_url_include=Off
+
+; Opciones base; Sesion.php completa la configuración de la cookie y su almacenamiento.
+session.use_strict_mode=1
+session.upload_progress.enabled=0
+date.timezone=America/Guatemala

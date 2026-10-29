@@ -1,4 +1,10 @@
 <?php
+/**
+ * Archivo: aplicacion/servicios/AlmacenDocumentos.php
+ * Propósito: Coordina los archivos privados en disco y sus registros SQL.
+ * Funcionamiento: Valida cargas, genera nombres internos, guarda metadatos y compensa fallos durante cargas o eliminaciones.
+ */
+
 declare(strict_types=1);
 namespace Aplicacion\Servicios;
 use Aplicacion\Nucleo\{Conexion, ExcepcionHttp};
@@ -21,9 +27,11 @@ final class AlmacenDocumentos
     /** Recibe la carga nativa y el propietario; valida contenido, genera nombres aleatorios y compensa fallos SQL. */
     public function subir(array $carga, int $usuario): void
     {
+        // Comprueba la estructura de la carga y los errores reportados por PHP antes de inspeccionar el contenido.
         if (!is_int($carga['error'] ?? null) || !is_string($carga['tmp_name'] ?? null) || !is_string($carga['name'] ?? null)) throw new ExcepcionHttp(422, 'Selecciona un archivo válido.');
         if (in_array($carga['error'], [UPLOAD_ERR_INI_SIZE, UPLOAD_ERR_FORM_SIZE], true)) throw new ExcepcionHttp(413, 'El archivo supera el máximo de 10 MB.');
         if ($carga['error'] !== UPLOAD_ERR_OK || !is_uploaded_file($carga['tmp_name'])) throw new ExcepcionHttp(422, 'No se pudo recibir el archivo. Intenta nuevamente.');
+        // Inspecciona el archivo temporal y obtiene los metadatos que se guardarán si la carga es válida.
         $datos = (new ValidadorDocumento())->inspeccionar($carga['tmp_name'], $carga['name']);
         // El ID identifica el registro; el nombre físico independiente evita exponer nombres originales en disco.
         $identificador = bin2hex(random_bytes(16)); $nombreAlmacenado = bin2hex(random_bytes(32));
@@ -35,6 +43,7 @@ final class AlmacenDocumentos
         $destino = $directorio . '/' . $nombreAlmacenado;
         if (!move_uploaded_file($carga['tmp_name'], $destino)) throw new \RuntimeException('No se pudo guardar la carga');
         try {
+            // Una vez guardado el binario, registra identidad, propietario, tipo, tamaño y ubicación relativa.
             Documento::crear([$identificador,$usuario,$datos['nombre_original'],$nombreAlmacenado,$datos['tipo_mime'],$datos['extension'],$datos['tamano_bytes'], $usuario . '/' . $nombreAlmacenado]);
         } catch (\Throwable $excepcion) {
             // Si falla MySQL después de mover el archivo, se compensa la operación retirando esa carga.
@@ -58,10 +67,12 @@ final class AlmacenDocumentos
             Documento::eliminar($identificador,$usuario);
             $conexion->commit();
         } catch (\Throwable $excepcion) {
+            // Ante un fallo revierte SQL y procura devolver al archivo su nombre original.
             if ($conexion->inTransaction()) $conexion->rollBack();
             if ($apartado !== null && is_file($apartado) && !rename($apartado, $ruta)) error_log('Restauración pendiente: ' . basename($apartado));
             throw $excepcion;
         }
+        // Después de confirmar SQL retira el binario apartado; si falla deja constancia para mantenimiento.
         if ($apartado !== null && is_file($apartado) && !unlink($apartado)) error_log('Limpieza pendiente: ' . basename($apartado));
     }
 }

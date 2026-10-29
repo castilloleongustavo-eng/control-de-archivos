@@ -1,7 +1,15 @@
+/**
+ * Archivo: publico/recursos/estilos/aplicacion.css
+ * Propósito: Es la hoja de entrada de los estilos propios.
+ * Funcionamiento: Importa hojas en orden; interfaz-nocturna sobrescribe la apariencia base y vista-documento añade los lectores.
+ */
 /* Entrada estable de estilos. La separación es visual y conserva las URLs del proyecto. */
+/* Base: variables, controles comunes y accesibilidad. */
 @import url("general.css");
+/* Pantallas de acceso, distribución del panel y componentes de documentos. */
 @import url("acceso.css");
 @import url("panel.css");
 @import url("componentes.css");
+/* Tema final: sobrescribe la base por cascada; después se añaden las reglas de los lectores. */
 @import url("interfaz-nocturna.css");
 @import url("vista-documento.css");
